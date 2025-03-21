@@ -2,13 +2,13 @@ import { message } from 'ant-design-vue'
 import axios from 'axios'
 //创建axios实例
 const myAxios = axios.create({
-  baseURL: 'https://localhost:8080/api/',
+  baseURL: 'http://localhost:8080/',
   timeout: 60000, //超时时间
   withCredentials: true, //是否允许携带cookie
 })
 
 // 添加请求拦截器
-axios.interceptors.request.use(
+myAxios.interceptors.request.use(
   function (config) {
     // 在发送请求之前做些什么
     return config
@@ -20,7 +20,7 @@ axios.interceptors.request.use(
 )
 
 // 添加响应拦截器
-axios.interceptors.response.use(
+myAxios.interceptors.response.use(
   function (response) {
     const { data } = response
     //未登录
@@ -33,7 +33,7 @@ axios.interceptors.response.use(
         message.warning('请先登陆！')
         window.location.href = `/user/login?redirect=${window.location.href}`
       }
-      return
+      return response
     }
     if (data.code === 50000) {
       //处理服务器异常

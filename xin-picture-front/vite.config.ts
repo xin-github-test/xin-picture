@@ -8,9 +8,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   server: {
     //通过代理，将/api的请求转发到localhost的8080端口，解决跨域问题
-    proxy: {
-      '/api': 'http://localhost:8080',
-    },
+    // proxy: {
+    //   '/api': 'http://localhost:8080',
+    // },
   },
   plugins: [vue(), vueDevTools()],
   resolve: {

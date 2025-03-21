@@ -37,6 +37,7 @@ const headerStyle: CSSProperties = {
   left: 0;
   right: 0;
   text-align: center;
+  font-size: 16px;
 }
 #basicLayout .header {
   padding-inline: 20px;
