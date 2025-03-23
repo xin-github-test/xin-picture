@@ -124,7 +124,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                 .collect(Collectors.toList());
         //1.关联查询用户信息
         //收集picturList中所涉及的所有userId并去重
-        Set<Long> userIdSet= pictureList.stream().map(Picture::getId).collect(Collectors.toSet());
+        Set<Long> userIdSet= pictureList.stream().map(Picture::getUserId).collect(Collectors.toSet());
         //获取 userId:User 的 Map
         Map<Long, List<User>> userIdUserListMap = userService.listByIds(userIdSet).stream().collect(Collectors.groupingBy(User::getId));
 

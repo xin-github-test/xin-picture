@@ -73,6 +73,14 @@ const originItems = [
     },
   },
   {
+    key: '/admin/pictureManage',
+    label: '图片管理',
+    title: '图片管理',
+    style: {
+      fontSize: '20px',
+    },
+  },
+  {
     key: '/about',
     label: '关于',
     title: '关于',
@@ -80,9 +88,20 @@ const originItems = [
       fontSize: '20px',
     },
   },
+
+  //图片相关
+  {
+    key: '/add_picture',
+    label: '创建图片',
+    title: '创建图片',
+    style: {
+      fontSize: '20px',
+    },
+  },
+
   {
     key: 'others',
-    label: h('a', { href: 'https://xinmini.us.kg', target: '_blank' }, 'xin的博客'),
+    label: h('a', { href: 'https://blog.xinmix.ddns-ip.net', target: '_blank' }, 'xin的博客'),
     title: '作者博客',
     style: {
       fontSize: '20px',
