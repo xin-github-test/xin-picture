@@ -118,8 +118,8 @@ const fetchData = async () => {
 //定义分页器,当searchParams变化时，computed会重新计算并响应回页面
 const pagination = computed(() => {
   return {
-    current: searchParams.current,
-    pageSize: searchParams.pageSize,
+    current: searchParams.current ?? 1,
+    pageSize: searchParams.pageSize ?? 10,
     total: total.value,
     showSizeChanger: true,
     showTotal: (total: number) => `共${total}条`,

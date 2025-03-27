@@ -35,4 +35,18 @@ public interface PictureConstant {
      * 图片默认目录（前期使用）
      */
     List<String> DEFAULT_IMG_CATEGORY_LIST = Arrays.asList("模板","电商","表情包","素材","海报");
+    /**
+     * 允许的图片类型
+     */
+    List<String> ALLOW_CONTENT_TYPES = Arrays.asList("image/jpeg","image/jpg","image/png","image/webp");
+
+    /**
+     * 批量抓取图片数量,默认10条（不要太高）
+     */
+    Integer CRAWLING_IMG_COUNT = 10;
+
+    /**
+     * 抓取图片的网址（使用bing搜索的图片）
+     */
+    String CRAWLING_BASE_URL = "https://cn.bing.com/images/async";
 }

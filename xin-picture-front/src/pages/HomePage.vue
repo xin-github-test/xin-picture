@@ -36,7 +36,7 @@
     <!-- 图片列表 -->
     <a-list
       :pagination="pagination"
-      :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 6 }"
+      :grid="{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 5, xxl: 5 }"
       :data-source="dataList"
       :loading="loading"
     >
@@ -55,7 +55,7 @@
               <template #description>
                 <a-flex>
                   <a-tag color="green">{{ picture.category ?? '默认' }}</a-tag>
-                  <a-tag v-for="tag in picture.tags" :key="tag">{{ tag }}</a-tag>
+                  <a-tag color="blue" v-for="tag in picture.tags" :key="tag">{{ tag }}</a-tag>
                 </a-flex>
               </template>
             </a-card-meta>
@@ -82,7 +82,7 @@ const router = useRouter()
 //搜索条件
 const searchParams = reactive<API.PictureQueryRequest>({
   current: 1,
-  pageSize: 12,
+  pageSize: 10,
   sortField: 'createTime',
   sortOrder: 'descend',
 })
@@ -120,7 +120,7 @@ const pagination = computed(() => {
     current: searchParams.current,
     pageSize: searchParams.pageSize,
     total: total.value,
-    onchange: (page: number, pageSize: number) => {
+    onChange: (page: number, pageSize: number) => {
       searchParams.current = page
       searchParams.pageSize = pageSize
       fetchData()

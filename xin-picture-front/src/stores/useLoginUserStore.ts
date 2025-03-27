@@ -6,14 +6,14 @@ import { getLoginUserUsingGet } from '@/api/userController'
  * 存储用户登陆信息的状态
  */
 export const useLoginUserStore = defineStore('loginUser', () => {
-  const loginUser = ref<API.LoginUserVo>({
+  const loginUser = ref<API.LoginUserVO>({
     userName: '未登录',
   })
   /**
    * 设置登陆用户
    * @param newLoginUser 获取到的用户
    */
-  function setLoginUser(newLoginUser: API.LoginUserVo) {
+  function setLoginUser(newLoginUser: API.LoginUserVO) {
     loginUser.value = newLoginUser
   }
   /**
