@@ -20,5 +20,7 @@ export function downloadImage(url?: string, fileName?: string) {
   if (!url) {
     return
   }
+  //下载的时候，下载原图
+  url = url.split('?')[0]
   saveAs(url, fileName)
 }

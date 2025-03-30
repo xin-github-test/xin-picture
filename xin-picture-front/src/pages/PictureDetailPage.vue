@@ -4,7 +4,10 @@
       <!-- 图片展示区 -->
       <a-col :sm="24" :md="16" :xl="18">
         <a-card title="图片预览">
-          <a-image style="max-height: 600px; object-fit: contain" :src="picture.url" />
+          <a-image
+            style="max-height: 600px; object-fit: contain"
+            :src="picture.url?.split('?')[0]"
+          />
         </a-card>
       </a-col>
       <!-- 图片信息区 -->

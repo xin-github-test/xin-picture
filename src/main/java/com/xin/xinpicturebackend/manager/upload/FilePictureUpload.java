@@ -20,7 +20,7 @@ public class FilePictureUpload extends PictureUploadTemplate{
         ThrowUtils.throwIf(multipartFile == null, ErrorCode.PARAMS_ERROR, "文件不能为空");
         //1.校验文件大小
         long fileSize = multipartFile.getSize();
-        ThrowUtils.throwIf(fileSize > 2 * PictureConstant.ONE_M, ErrorCode.PARAMS_ERROR, "文件大小不能超过 2MB");
+        ThrowUtils.throwIf(fileSize > 5 * PictureConstant.ONE_M, ErrorCode.PARAMS_ERROR, "文件大小不能超过 2MB");
         //2.校验图片后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         //允许上传的文件集合

@@ -12,6 +12,7 @@ import com.xin.xinpicturebackend.constant.PictureConstant;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.exception.ThrowUtils;
+import com.xin.xinpicturebackend.manager.CosManager;
 import com.xin.xinpicturebackend.manager.upload.FilePictureUpload;
 import com.xin.xinpicturebackend.manager.upload.PictureUploadTemplate;
 import com.xin.xinpicturebackend.manager.upload.UrlPictureUpload;
@@ -33,6 +34,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -56,6 +58,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     FilePictureUpload filePictureUpload;
     @Resource
     UrlPictureUpload urlPictureUpload;
+    @Resource
+    CosManager cosManager;
     @Override
     public PictureVO uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
         //1.校验参数
@@ -398,6 +402,24 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         }
         //4.返回成功上传的图片数量
         return uploadCount;
+    }
+
+    /**
+     * 清理图片
+     * @param oldPicture
+     */
+    @Async   //表示该方法异步执行，想要启用该注解，需要在项目启动类上@EnableAsync
+    @Override
+    public void clearPictureFile(Picture oldPicture) {
+        //判断图片是否被多条记录引用
+        String pictureUrl = oldPicture.getUrl();
+        Long count = this.lambdaQuery().eq(Picture::getUrl, pictureUrl)
+                .count();
+        //有多个记录引用
+        if (count > 1) {
+            return;
+        }
+        cosManager.deleteObject(pictureUrl);
     }
 }
 

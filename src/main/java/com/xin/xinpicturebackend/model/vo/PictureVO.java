@@ -1,6 +1,7 @@
 package com.xin.xinpicturebackend.model.vo;
 
 import cn.hutool.json.JSONUtil;
+import com.xin.xinpicturebackend.constant.OSSImageProcessStyleConstants;
 import com.xin.xinpicturebackend.model.entity.Picture;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
@@ -117,9 +118,18 @@ public class PictureVO implements Serializable {
         }
         PictureVO pictureVO = new PictureVO();
         BeanUtils.copyProperties(picture, pictureVO);
+
         // 类型不同，需要转换
         pictureVO.setTags(JSONUtil.toList(picture.getTags(), String.class));
         return pictureVO;
+    }
+
+    /**
+     * 自定义 url 的Setter方法，后缀加上样式处理
+     * @param url
+     */
+    public void setUrl(String url) {
+        this.url = url + OSSImageProcessStyleConstants.IMAGE_FORMAT_TO_WEBP;
     }
 }
 
