@@ -95,7 +95,7 @@ const handleSubmit = async (values: any) => {
     //跳转到图片详情页
     router.push(`/picture/${pictureId}`)
   } else {
-    message.error('创建失败，', res.data.message)
+    message.error('创建失败，' + res.data.message)
   }
 }
 

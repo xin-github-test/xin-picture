@@ -78,7 +78,7 @@ const handleSubmit = async (values: any) => {
     //跳转到主页
     router.push(`/`)
   } else {
-    message.error('创建失败，', res.data.message)
+    message.error('创建失败，' + res.data.message)
   }
   loading.value = false
 }

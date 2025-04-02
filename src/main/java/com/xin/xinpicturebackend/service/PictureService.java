@@ -3,14 +3,10 @@ package com.xin.xinpicturebackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.xin.xinpicturebackend.model.dto.picture.PictureQueryRequest;
-import com.xin.xinpicturebackend.model.dto.picture.PictureReviewRequest;
-import com.xin.xinpicturebackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.xin.xinpicturebackend.model.dto.picture.PictureUploadRequest;
+import com.xin.xinpicturebackend.model.dto.picture.*;
 import com.xin.xinpicturebackend.model.entity.Picture;
 import com.xin.xinpicturebackend.model.entity.User;
 import com.xin.xinpicturebackend.model.vo.PictureVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,4 +80,20 @@ public interface PictureService extends IService<Picture> {
      * @param oldPicture
      */
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 删除图片
+     * @param pictureId
+     * @param loginUser
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 校验空间图片的权限
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
 }
