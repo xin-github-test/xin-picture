@@ -27,7 +27,6 @@ public class CacheManager {
     /**
      * 本地缓存初始化
      */
-    @Resource
     private final Cache<String, String> LOCAL_CACHE = Caffeine.newBuilder()
             .initialCapacity(1024)
             .maximumSize(10_000L)  //最大1w条数据

@@ -68,12 +68,15 @@ const handleSubmit = async (values: any) => {
 
 <style scoped>
 #userLoginPage {
-  max-width: 360px;
+  max-width: 420px;
   margin: 0 auto;
+  margin-top: 32px;
 }
 .title {
   text-align: center;
+  font-size: 24px;
   margin-bottom: 16px;
+  font-weight: bold;
 }
 .desc {
   text-align: center;

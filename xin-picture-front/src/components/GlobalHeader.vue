@@ -4,8 +4,8 @@
       <a-col flex="200px">
         <RouterLink to="/">
           <div class="title-bar">
-            <img class="logo" src="../assets/logo.svg" alt="logo" />
-            <div class="title">在线图库平台</div>
+            <img class="logo" src="@/assets/logo.png" alt="logo" />
+            <div class="title">星图库</div>
           </div>
         </RouterLink>
       </a-col>
@@ -155,13 +155,15 @@ const doLogout = async () => {
 #globalHeader .title-bar {
   display: flex;
   align-items: center;
+  background-color: rgb(253, 101, 132);
+  border-radius: 28px;
 }
 .logo {
   height: 48px;
 }
 .title {
-  color: black;
-  font-size: 18px;
+  color: rgb(63, 61, 86);
+  font-size: 30px;
   margin-left: 16px;
 }
 </style>
