@@ -125,5 +125,8 @@ onMounted(() => {
 #addSpacePage {
   max-width: 720px;
   margin: 0 auto;
+  background-color: rgba(123, 90, 242, 0.1);
+  padding: 32px;
+  border-radius: 5%;
 }
 </style>

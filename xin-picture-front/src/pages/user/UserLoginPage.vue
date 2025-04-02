@@ -1,6 +1,6 @@
 <template>
   <div id="userLoginPage">
-    <div class="title">xin-云图库 - 用户登录</div>
+    <div class="title">星图库 - 用户登录</div>
     <div style="margin-bottom: 16px" />
     <div class="desc">智能协同云图库</div>
     <div style="margin-bottom: 16px" />
@@ -71,6 +71,9 @@ const handleSubmit = async (values: any) => {
   max-width: 420px;
   margin: 0 auto;
   margin-top: 32px;
+  background-color: rgba(66, 68, 70, 0.1);
+  padding: 32px;
+  border-radius: 8%;
 }
 .title {
   text-align: center;

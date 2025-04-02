@@ -3,7 +3,7 @@
     <a-layout style="min-height: 100vh">
       <a-layout-header class="header"><GlobalHeader /></a-layout-header>
       <a-layout>
-        <GlobalSider class="sider"/>
+        <GlobalSider class="sider" />
         <a-layout-content class="content"><RouterView /></a-layout-content>
       </a-layout>
       <a-layout-footer class="footer">
@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import GlobalHeader from '@/components/GlobalHeader.vue'
-import GlobalSider from '@/components/GlobalSider.vue';
+import GlobalSider from '@/components/GlobalSider.vue'
 import type { CSSProperties } from 'vue'
 import { SmileOutlined } from '@ant-design/icons-vue'
 
@@ -41,16 +41,18 @@ const headerStyle: CSSProperties = {
 }
 #basicLayout .content {
   padding: 28px;
-
   /* background: linear-gradient(to right, #fefefe, #fff); */
   background-image: url('/src/assets/svg/tree.svg');
   background-repeat: no-repeat;
   background-size: cover;
-
   margin-bottom: 28px;
 }
+
 #basicLayout .footer {
-  background: #efefef;
+  /* background: #efefef; */
+  background-image: url('/src/assets/svg/hill.svg');
+  background-size: 200px, auto;
+
   padding: 16px;
   position: fixed;
   bottom: 0;
@@ -61,7 +63,8 @@ const headerStyle: CSSProperties = {
   font-family: 'Lucida Calligraphy', cursive, serif, sans-serif;
 }
 #basicLayout .header {
-  padding-inline: 20px;
+  padding-right: 20px;
+  padding-left: 0px;
   background: white;
   color: unset;
   margin-bottom: 2px;

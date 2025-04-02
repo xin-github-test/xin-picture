@@ -17,12 +17,18 @@
           @click="doMenuClick"
         />
       </a-col>
+      <a-col flex="auto">
+        <img src="@/assets/svg/2025.svg" alt="2025" style="height: 64px" />
+      </a-col>
       <a-col flex="120px">
         <!-- 若是用户已经登陆则显示用户登陆信息 -->
         <div v-if="loginUserStore.loginUser.id">
           <a-dropdown>
             <a-space>
-              <a-avatar :src="loginUserStore.loginUser.userAvatar" />
+              <a-avatar
+                style="width: 45px; height: 45px"
+                :src="loginUserStore.loginUser.userAvatar"
+              />
               <span style="font-size: 20px">{{
                 loginUserStore.loginUser.userName ?? '无名法师'
               }}</span>
@@ -35,6 +41,32 @@
                     我的空间
                   </router-link>
                 </a-menu-item>
+
+                <a-menu-item
+                  v-if="loginUserStore.loginUser && loginUserStore.loginUser.userRole === 'admin'"
+                >
+                  <router-link to="/admin/userManage">
+                    <TeamOutlined />
+                    用户管理
+                  </router-link>
+                </a-menu-item>
+                <a-menu-item
+                  v-if="loginUserStore.loginUser && loginUserStore.loginUser.userRole === 'admin'"
+                >
+                  <router-link to="/admin/pictureManage">
+                    <PictureOutlined />
+                    图片管理
+                  </router-link>
+                </a-menu-item>
+                <a-menu-item
+                  v-if="loginUserStore.loginUser && loginUserStore.loginUser.userRole === 'admin'"
+                >
+                  <router-link to="/admin/spaceManage">
+                    <SwitcherOutlined />
+                    空间管理
+                  </router-link>
+                </a-menu-item>
+
                 <a-menu-item @click="doLogout">
                   <LogoutOutlined />
                   退出登陆
@@ -52,7 +84,17 @@
 </template>
 <script lang="ts" setup>
 import { computed, h, ref } from 'vue'
-import { HomeOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import {
+  HomeOutlined,
+  UserOutlined,
+  TeamOutlined,
+  LogoutOutlined,
+  PictureOutlined,
+  SwitcherOutlined,
+  PlusOutlined,
+  QuestionOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons-vue'
 import { message, type MenuProps } from 'ant-design-vue'
 import { useRouter } from 'vue-router'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
@@ -70,53 +112,21 @@ const originItems = [
       fontSize: '20px',
     },
   },
-  {
-    key: '/admin/userManage',
-    label: '用户管理',
-    title: '用户管理',
-    style: {
-      fontSize: '20px',
-    },
-  },
-  {
-    key: '/admin/pictureManage',
-    label: '图片管理',
-    title: '图片管理',
-    style: {
-      fontSize: '20px',
-    },
-  },
-  {
-    key: '/admin/spaceManage',
-    label: '空间管理',
-    title: '空间管理',
-    style: {
-      fontSize: '20px',
-    },
-  },
-  {
-    key: '/about',
-    label: '关于',
-    title: '关于',
-    style: {
-      fontSize: '20px',
-    },
-  },
-
   //图片相关
   {
     key: '/add_picture',
+    icon: () => h(PlusOutlined, { style: { fontSize: '20px' } }),
     label: '创建图片',
     title: '创建图片',
     style: {
       fontSize: '20px',
     },
   },
-
   {
-    key: 'others',
-    label: h('a', { href: 'https://blog.xinmix.ddns-ip.net', target: '_blank' }, 'xin的博客'),
-    title: '作者博客',
+    key: '/about',
+    icon: () => h(QuestionCircleOutlined, { style: { fontSize: '20px' } }),
+    label: '关于',
+    title: '关于',
     style: {
       fontSize: '20px',
     },
@@ -169,15 +179,24 @@ const doLogout = async () => {
 #globalHeader .title-bar {
   display: flex;
   align-items: center;
-  background-color: rgb(253, 101, 132);
-  border-radius: 28px;
+  background-image: linear-gradient(
+    -60deg,
+    transparent,
+    #0ab9cf 14%,
+    #7535e7 42%,
+    /* #f9132f 42%, #ffbd00 70%, */ /* #72a043 70%, #0ab9cf 84%, */ rgba(0, 196, 204, 0) 100%
+  );
+  /* border-radius: 28px; */
 }
 .logo {
+  margin-left: 16px;
   height: 48px;
 }
 .title {
-  color: rgb(63, 61, 86);
-  font-size: 30px;
-  margin-left: 16px;
+  /* color: rgb(63, 61, 86); */
+  color: rgb(253, 101, 132);
+  font-size: 35px;
+  margin-left: 8px;
+  font-family: 'Lucida Calligraphy', cursive, serif, sans-serif;
 }
 </style>
