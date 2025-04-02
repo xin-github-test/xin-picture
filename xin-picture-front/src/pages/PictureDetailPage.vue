@@ -123,6 +123,7 @@ const doEdit = () => {
 const doDownload = () => {
   downloadImage(picture.value.url)
 }
+// TODO 图片详情页界面也需要优化
 //获取图片详情
 const fetchPictureDetail = async () => {
   try {
