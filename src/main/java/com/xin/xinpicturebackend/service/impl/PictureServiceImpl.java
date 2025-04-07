@@ -8,6 +8,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xin.xinpicturebackend.CrawStrategy.StrategyContext;
 import com.xin.xinpicturebackend.constant.PictureConstant;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
@@ -41,6 +42,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -64,6 +66,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     SpaceService spaceService;
     @Resource
     TransactionTemplate transactionTemplate;
+    @Resource
+    StrategyContext strategyContext;
 
     @Override
     public PictureVO uploadPicture(Object inputSource, PictureUploadRequest pictureUploadRequest, User loginUser) {
@@ -387,7 +391,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //1.校验参数
         ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR);
         String searchText = pictureUploadByBatchRequest.getSearchText();
-        Integer count = pictureUploadByBatchRequest.getCount();
         String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
         String tags = JSONUtil.toJsonStr(pictureUploadByBatchRequest.getTags());
         String category = pictureUploadByBatchRequest.getCategory();
@@ -395,9 +398,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             //如果未自定义名称，设置默认值(搜索词)
             namePrefix = searchText;
         }
+        Integer count = pictureUploadByBatchRequest.getCount();
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多抓取30条！");
         //2.抓取内容
-        String fetchUrl = String.format(PictureConstant.CRAWLING_BASE_URL + "?q=%s&mmasync=1", searchText);
+        //TODO 设置抓取内容的网址(默认为0) 每个网址的查询的 url 不同，需要统一封装
+        String webAddr = PictureConstant.CRAWLING_BASE_URL_LIST.get(0);
+        String fetchUrl = String.format(webAddr + "?q=%s&mmasync=1", searchText);
         Document document;
         try {
             document = Jsoup.connect(fetchUrl).get();
@@ -456,10 +462,37 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //4.返回成功上传的图片数量
         return uploadCount;
     }
+    /**
+     * TODO 未测试
+     * 批量抓取和保存图片
+     * @param pictureUploadByBatchRequest 抓取图片请求
+     * @param loginUser 当前登陆用户
+     * @return 成功保存图片数量
+     */
+    @Override
+    public Integer uploadCrawingPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
+        //1.校验参数
+        ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR);
+        String searchText = pictureUploadByBatchRequest.getSearchText();
 
+        //2.限制爬虫
+        Integer count = pictureUploadByBatchRequest.getCount();
+        ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多抓取30条！");
+
+        //TODO 3.抓取内容 还可以优化，这里使用了策略模式
+        List<String> picUrlList = strategyContext.crawing(searchText, count);
+
+        //4.根据url批量上传图片并返回成功上传的图片的数量
+        CompletableFuture<Integer> future = uploadPicsByUrl(picUrlList, pictureUploadByBatchRequest, loginUser);
+        try {
+            return future.get();
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"图片异步上传失败！");
+        }
+    }
     /**
      * 清理图片
-     * @param oldPicture
+     * @param oldPicture 旧图片
      */
     @Async   //表示该方法异步执行，想要启用该注解，需要在项目启动类上@EnableAsync
     @Override
@@ -531,6 +564,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         boolean res = this.updateById(picture);
         ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR,"图片更新失败！");
     }
+
+    /**
+     * 判断图片与用户之间权限关系
+     * @param loginUser 当前登录的用户
+     * @param picture 待验证权限的图片
+     */
     @Override
     public void checkPictureAuth(User loginUser, Picture picture) {
         Long spaceId = picture.getSpaceId();
@@ -545,6 +584,55 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
             }
         }
+    }
+
+    /**
+     * TODO 未测试
+     * 根据url批量上传图片到oss（异步 + 流）
+     *
+     * @param picUrlList                  待上传的图片url列表
+     * @param pictureUploadByBatchRequest 前端上传图片所携带的参数
+     * @param loginUser                   当前登录的用户
+     * @return 返回成功上传的图片的数量
+     */
+    public CompletableFuture<Integer> uploadPicsByUrl(List<String> picUrlList, PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
+        String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
+        if (StrUtil.isBlank(namePrefix)) {
+            //如果未自定义名称，设置默认值(搜索词)
+            namePrefix = pictureUploadByBatchRequest.getSearchText();
+        }
+        String tags = JSONUtil.toJsonStr(pictureUploadByBatchRequest.getTags());
+        String category = pictureUploadByBatchRequest.getCategory();
+
+        // 使用流来异步上传每个图片
+        String finalNamePrefix = namePrefix;
+        List<CompletableFuture<Void>> futures = picUrlList.stream()
+                .map(fileUrl -> CompletableFuture.runAsync(() -> {
+                   // 上传图片
+                   PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
+                   pictureUploadRequest.setFileUrl(fileUrl);
+                   // 设置默认名称
+                   pictureUploadRequest.setPicName(finalNamePrefix + "-" + (picUrlList.indexOf(fileUrl) + 1));
+                   // 设置标签和分类
+                   if (StrUtil.isNotBlank(tags)) {
+                       pictureUploadRequest.setTags(tags);
+                   }
+                   if (StrUtil.isNotBlank(category)) {
+                       pictureUploadRequest.setCategory(category);
+                   }
+                   try {
+                       //上传图片
+                       PictureVO pictureVO = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+                       log.info("图片上传成功，id = {}", pictureVO.getId());
+                   } catch (Exception e) {
+                       // 上传失败，跳过
+                       log.error("图片上传失败，", e);
+                   }
+               }))
+                .collect(Collectors.toList());
+        // 使用 allOf 等待所有的异步任务完成
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> (int) futures.stream().filter(CompletableFuture::isDone).count());
     }
 }
 

@@ -1,5 +1,6 @@
 package com.xin.xinpicturebackend.constant;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -48,5 +49,5 @@ public interface PictureConstant {
     /**
      * 抓取图片的网址（使用bing搜索的图片）
      */
-    String CRAWLING_BASE_URL = "https://cn.bing.com/images/async";
+    List<String> CRAWLING_BASE_URL_LIST = new ArrayList<>(Arrays.asList("https://cn.bing.com/images/async", "https://en.freejpg.com.ar/"));
 }
