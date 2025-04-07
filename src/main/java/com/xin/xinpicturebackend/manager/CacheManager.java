@@ -85,7 +85,7 @@ public class CacheManager {
      * 2）更新数据库
      * 3）time.sleep()
      * 4）调用 deleteCache 再次删除缓存
-     * @param key
+     * @param key  图片对应的key
      */
     public void deleteCache(String key) {
         stringRedisTemplate.delete(key);
@@ -95,14 +95,12 @@ public class CacheManager {
     //从redis中获取数据
     private String getCacheByRedis(String key) {
         ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
-        String cachedValue = opsForValue.get(key);
-        return cachedValue;
+        return opsForValue.get(key);
     }
 
     //从本地缓存中获取数据
     private String getCacheByCaffeine(String key) {
-        String cachedValue = LOCAL_CACHE.getIfPresent(key);
-        return cachedValue;
+        return LOCAL_CACHE.getIfPresent(key);
     }
 
     /**
@@ -115,7 +113,6 @@ public class CacheManager {
         //构建缓存key
         String queryCondition = JSONUtil.toJsonStr(operationRequest);
         String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
-        String cacheKey = String.format(ProjectConstant.PROJECT_NAME + ":" + methodName + ":%s",hashKey);
-        return cacheKey;
+         return String.format(ProjectConstant.PROJECT_NAME + ":" + methodName + ":%s",hashKey);
     }
 }

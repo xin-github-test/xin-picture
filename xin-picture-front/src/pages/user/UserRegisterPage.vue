@@ -56,7 +56,7 @@ const formState = reactive<API.UserRegisterRequest>({
  */
 const handleSubmit = async (values: any) => {
   //做一些校验，俩次输入的密码是否一致
-  if (values.password !== values.checkPassword) {
+  if (values.userPassword !== values.checkPassword) {
     message.error('两次输入的密码不一致')
     return
   }
@@ -78,12 +78,18 @@ const handleSubmit = async (values: any) => {
 
 <style scoped>
 #userRegisterPage {
-  max-width: 360px;
+  max-width: 420px;
   margin: 0 auto;
+  margin-top: 32px;
+  background-color: rgba(66, 68, 70, 0.1);
+  padding: 32px;
+  border-radius: 8%;
 }
 .title {
   text-align: center;
+  font-size: 24px;
   margin-bottom: 16px;
+  font-weight: bold;
 }
 .desc {
   text-align: center;
