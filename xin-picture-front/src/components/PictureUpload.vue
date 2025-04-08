@@ -25,6 +25,7 @@ import { uploadPictureUsingPost } from '@/api/pictureController'
 //定义父组件传来的props,父组件传来的props
 interface Props {
   picture?: API.PictureVO
+  spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
 
@@ -37,7 +38,8 @@ const props = defineProps<Props>()
 const handleUpload = async ({ file }: any) => {
   loading.value = true
   try {
-    const params = props.picture?.id ? { id: props.picture.id } : {}
+    const params: API.PictureUploadRequest = props.picture?.id ? { id: props.picture.id } : {}
+    params.spaceId = props.spaceId
     //调用后端接口上传图片
     const res = await uploadPictureUsingPost(params, {}, file)
     if (res.data.code === 0 && res.data.data) {

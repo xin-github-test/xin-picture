@@ -13,7 +13,7 @@
       </a-space>
     </a-flex>
     <!-- 图片列表 -->
-    <PictureList :loading="loading" :dataList="dataList" />
+    <PictureList :loading="loading" :dataList="dataList" :showOp="true" :onReload="fetchData" />
     <!-- 分页 -->
     <a-pagination
       v-if="dataList.length > 0"

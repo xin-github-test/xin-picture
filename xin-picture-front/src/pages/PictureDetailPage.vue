@@ -117,7 +117,14 @@ const doDelete = async () => {
 const router = useRouter()
 //编辑
 const doEdit = () => {
-  router.push('/add_picture?id=' + picture.value.id)
+  //跳转时需要携带spaceId
+  router.push({
+    path: '/add_picture',
+    query: {
+      id: picture.value.id,
+      spaceId: picture.value.spaceId,
+    },
+  })
 }
 //下载
 const doDownload = () => {
