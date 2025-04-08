@@ -23,6 +23,7 @@ import { uploadPictureByUrlUsingPost, uploadPictureUsingPost } from '@/api/pictu
 //定义父组件传来的props,父组件传来的props
 interface Props {
   picture?: API.PictureVO
+  spaceId?: number
   onSuccess?: (newPicture: API.PictureVO) => void
 }
 
@@ -37,6 +38,7 @@ const handleUpload = async () => {
   loading.value = true
   try {
     const params: API.PictureUploadRequest = { fileUrl: fileUrl.value }
+    params.spaceId = props.spaceId
     if (props.picture) {
       params.id = props.picture.id
     }
