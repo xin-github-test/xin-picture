@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xin.xinpicturebackend.annotation.AuthCheck;
+import com.xin.xinpicturebackend.api.imagesearch.ImageSearchApiFacade;
+import com.xin.xinpicturebackend.api.imagesearch.model.ImageSearchResult;
 import com.xin.xinpicturebackend.common.BaseResponse;
 import com.xin.xinpicturebackend.common.DeleteRequest;
 import com.xin.xinpicturebackend.common.ResultUtils;
@@ -39,6 +41,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -447,5 +450,24 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         Integer uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(uploadCount);
+    }
+
+    /**
+     * 以图搜图
+     * @param searchPictureByPictureRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/search/picture")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(@RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+        Long pictureId = searchPictureByPictureRequest.getPictureId();
+        ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR);
+        Picture picture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+
+        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(picture.getUrl());
+        return ResultUtils.success(resultList);
     }
 }

@@ -7,11 +7,19 @@
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
         >
-          <a-progress :size="42" type="circle" :percent="20" :width="80" />
+          <a-progress
+            :size="42"
+            type="circle"
+            :percent="((space.totalSize * 100) / space.maxSize).toFixed(1)"
+            :width="80"
+          />
         </a-tooltip>
         <a-button type="primary" :href="`/add_picture?spaceId=${space.id}`">创建图片</a-button>
       </a-space>
     </a-flex>
+    <!-- 搜索表单 -->
+    <PictureSearchForm :onSearch="onSearch" />
+    <div style="margin-bottom: 24px" />
     <!-- 图片列表 -->
     <PictureList :loading="loading" :dataList="dataList" :showOp="true" :onReload="fetchData" />
     <!-- 分页 -->
@@ -26,11 +34,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { listPictureVoByPageWithCaffeCacheUsingPost } from '@/api/pictureController'
+import {
+  listPictureVoByPageUsingPost,
+  listPictureVoByPageWithCaffeCacheUsingPost,
+} from '@/api/pictureController'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 import { formatSize } from '@/utils'
 import { message } from 'ant-design-vue'
 import { onMounted, ref, h, computed, reactive } from 'vue'
+import PictureList from '@/components/PictureList.vue'
+import PictureSearchForm from '@/components/PictureSearchForm.vue'
 
 interface Props {
   id: string | number
@@ -62,7 +75,7 @@ const total = ref(0)
 const loading = ref(false)
 
 //搜索条件
-const searchParams = reactive<API.PictureQueryRequest>({
+const searchParams = ref<API.PictureQueryRequest>({
   current: 1,
   pageSize: 10,
   sortField: 'createTime',
@@ -74,14 +87,14 @@ const fetchData = async () => {
   //转换搜索参数
   const params = {
     spaceId: props.id,
-    ...searchParams,
+    ...searchParams.value,
   }
 
-  // const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPageUsingPost(params)
   //使用缓存接口-redis
   // const res = await listPictureVoByPageWithCacheUsingPost(params)
   //使用本地缓存caffeine
-  const res = await listPictureVoByPageWithCaffeCacheUsingPost(params)
+  // const res = await listPictureVoByPageWithCaffeCacheUsingPost(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0
@@ -95,8 +108,17 @@ onMounted(() => {
 })
 //定义分页器,当searchParams变化时，computed会重新计算并响应回页面
 const onPageChange = (page: number, pageSize: number) => {
-  searchParams.current = page
-  searchParams.pageSize = pageSize
+  searchParams.value.current = page
+  searchParams.value.pageSize = pageSize
+  fetchData()
+}
+//触发搜索
+const onSearch = (newSearchParams: API.PictureQueryRequest) => {
+  searchParams.value = {
+    ...searchParams.value,
+    ...newSearchParams,
+    current: 1,
+  }
   fetchData()
 }
 </script>
