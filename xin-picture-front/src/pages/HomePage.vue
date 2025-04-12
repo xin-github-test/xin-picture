@@ -48,6 +48,7 @@
 <script setup lang="ts">
 import {
   listPictureTagCategoryUsingGet,
+  listPictureVoByPageUsingPost,
   listPictureVoByPageWithCaffeCacheUsingPost,
 } from '@/api/pictureController'
 import PictureList from '@/components/PictureList.vue'
@@ -81,11 +82,11 @@ const fetchData = async () => {
       params.tags.push(tagList.value[index])
     }
   })
-  // const res = await listPictureVoByPageUsingPost(params)
+  const res = await listPictureVoByPageUsingPost(params)
   //使用缓存接口-redis
   // const res = await listPictureVoByPageWithCacheUsingPost(params)
   //使用本地缓存caffeine
-  const res = await listPictureVoByPageWithCaffeCacheUsingPost(params)
+  // const res = await listPictureVoByPageWithCaffeCacheUsingPost(params)
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []
     total.value = res.data.data.total ?? 0

@@ -20,7 +20,7 @@
         <a-input v-model:value="searchParams.category" allow-clear placeholder="请输入类型">
         </a-input>
       </a-form-item>
-      <a-form-item lable="类型">
+      <a-form-item lable="标签">
         <a-select
           v-model:value="searchParams.tags"
           mode="tags"
