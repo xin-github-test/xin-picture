@@ -393,6 +393,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
      * @param loginUser 当前登陆用户
      * @return 成功保存图片数量
      */
+    @Deprecated
     @Override
     public Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
         //1.校验参数
@@ -408,7 +409,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer count = pictureUploadByBatchRequest.getCount();
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多抓取30条！");
         //2.抓取内容
-        //TODO 设置抓取内容的网址(默认为0) 每个网址的查询的 url 不同，需要统一封装
         String webAddr = PictureConstant.CRAWLING_BASE_URL_LIST.get(0);
         String fetchUrl = String.format(webAddr + "?q=%s&mmasync=1", searchText);
         Document document;
@@ -470,7 +470,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         return uploadCount;
     }
     /**
-     * TODO 未测试
      * 批量抓取和保存图片
      * @param pictureUploadByBatchRequest 抓取图片请求
      * @param loginUser 当前登陆用户
@@ -486,7 +485,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer count = pictureUploadByBatchRequest.getCount();
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多抓取30条！");
 
-        //TODO 3.抓取内容 还可以优化，这里使用了策略模式
         List<String> picUrlList = strategyContext.crawing(searchText, count);
 
         //4.根据url批量上传图片并返回成功上传的图片的数量
@@ -594,7 +592,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     }
 
     /**
-     * TODO 未测试
      * 根据url批量上传图片到oss（异步 + 流）
      *
      * @param picUrlList                  待上传的图片url列表
