@@ -8,4 +8,6 @@ public interface OSSImageProcessStyleConstants {
     String IMAGE_INFO = "image/info";
     //将图片格式转换成webp
     String IMAGE_FORMAT_TO_WEBP = "?x-oss-process=style/format_change";
+    //将图片格式转换成png
+    String IMAGE_FORMAT_TO_PNG = "?x-oss-process=style/topng";
 }
