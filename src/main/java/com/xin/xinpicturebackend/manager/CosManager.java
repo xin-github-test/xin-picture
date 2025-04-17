@@ -2,6 +2,9 @@ package com.xin.xinpicturebackend.manager;
 
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONUtil;
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
@@ -10,8 +13,10 @@ import com.aliyun.oss.common.utils.IOUtils;
 import com.aliyun.oss.model.*;
 
 import com.xin.xinpicturebackend.config.CosClientConfig;
+import com.xin.xinpicturebackend.constant.OSSImageProcessStyleConstants;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
+import com.xin.xinpicturebackend.exception.ThrowUtils;
 import com.xin.xinpicturebackend.model.dto.file.UploadPictureResult;
 import org.springframework.stereotype.Component;
 
@@ -154,10 +159,26 @@ public class CosManager {
             uploadPictureResult.setPicScale(NumberUtil.round(width * 1.0 / height,
                     2).doubleValue());
             uploadPictureResult.setPicFormat(format);
+            //获取图片主色调
+            Map<String, Object> res = getResByStyleUsingPost(cosClientConfig.getHost() + url, OSSImageProcessStyleConstants.GET_IMAGE_AVE);
+            uploadPictureResult.setPicColor((String) res.get("RGB"));
         } catch (Exception e) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"获取图像信息失败!");
         }
         return uploadPictureResult;
     }
 
+    public Map<String,Object> getResByStyleUsingPost(String imgUrl, String style){
+        ThrowUtils.throwIf(imgUrl == null || style == null, ErrorCode.OPERATION_ERROR);
+        HttpResponse response = HttpRequest.get(imgUrl + style)
+                .timeout(5000)
+                .execute();
+        // 判断响应状态
+        if (HttpStatus.HTTP_OK != response.getStatus()) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "接口调用失败");
+        }
+        // 解析响应
+        String responseBody = response.body();
+        return JSONUtil.toBean(responseBody, Map.class);
+    }
 }
