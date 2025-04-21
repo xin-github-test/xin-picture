@@ -18,7 +18,7 @@
         />
       </a-col>
       <a-col flex="auto">
-        <img src="@/assets/svg/2025.svg" alt="2025" style="height: 64px" />
+        <img src="@/assets/svg/2025.svg" alt="2025" style="height: 64px; margin-top: 18px" />
       </a-col>
       <a-col flex="120px">
         <!-- 若是用户已经登陆则显示用户登陆信息 -->
@@ -27,7 +27,7 @@
             <a-space>
               <a-avatar
                 style="width: 45px; height: 45px"
-                :src="loginUserStore.loginUser.userAvatar"
+                :src="loginUserStore.loginUser.userAvatar || '/avatar.jpg'"
               />
               <span style="font-size: 20px">{{
                 loginUserStore.loginUser.userName ?? '无名法师'
@@ -123,7 +123,7 @@ const originItems = [
     },
   },
   {
-    key: '/about',
+    key: '/test',
     icon: () => h(QuestionCircleOutlined, { style: { fontSize: '20px' } }),
     label: '关于',
     title: '关于',

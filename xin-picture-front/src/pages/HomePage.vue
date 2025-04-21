@@ -37,6 +37,7 @@
     <PictureList :loading="loading" :dataList="dataList" />
     <!-- 分页 -->
     <a-pagination
+      v-if="dataList.length > 0"
       v-model:current="searchParams.current"
       v-model:pageSize="searchParams.pageSize"
       :total="total"

@@ -5,6 +5,7 @@
       breakpoint="lg"
       collapsed-width="0"
       width="200"
+      style="background: white; margin-top: 0px"
     >
       <a-menu v-model:selectedKeys="current" mode="inline" :items="menuItems" @click="doMenuClick">
       </a-menu>

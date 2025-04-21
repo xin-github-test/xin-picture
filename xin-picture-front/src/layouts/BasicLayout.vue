@@ -31,7 +31,7 @@ const headerStyle: CSSProperties = {
 </script>
 <style scoped>
 #basicLayout .sider {
-  padding-top: 20px;
+  /* padding-top: 20px; */
   background: white;
   border-right: 0.5px solid #eee;
 }
@@ -67,6 +67,6 @@ const headerStyle: CSSProperties = {
   padding-left: 0px;
   background: white;
   color: unset;
-  margin-bottom: 2px;
+  /* margin-bottom: 2px; */
 }
 </style>
