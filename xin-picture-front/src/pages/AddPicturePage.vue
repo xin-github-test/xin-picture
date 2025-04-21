@@ -18,9 +18,32 @@
     </a-tabs>
     <!-- 图片编辑 -->
     <div v-if="picture" class="edit-bar">
-      <a-button :icon="h(EditOutlined)" ghost type="primary" @click="doEditPicture"
-        >编辑图片</a-button
-      >
+      <a-space size="middle">
+        <a-button :icon="h(EditOutlined)" ghost type="primary" @click="doEditPicture"
+          >编辑图片</a-button
+        >
+        <a-button
+          v-if="showAIScaleButton"
+          type="primary"
+          :icon="h(FullscreenOutlined)"
+          ghost
+          @click="doImagePainting"
+          >AI 扩图</a-button
+        >
+      </a-space>
+      <ImageCropper
+        ref="imageCropperRef"
+        :imageUrl="picture?.url?.split('?')[0]"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onCropSuccess"
+      />
+      <ImageOutPainting
+        ref="imageOutPaintingRef"
+        :picture="picture"
+        :spaceId="spaceId"
+        :onSuccess="onImageOutPaintingSuccess"
+      />
     </div>
     <!-- 图片信息表单 -->
     <!-- 搜索表单 -->
@@ -64,13 +87,6 @@
       </a-form-item>
     </a-form>
   </div>
-  <ImageCropper
-    ref="imageCropperRef"
-    :imageUrl="picture?.url?.split('?')[0]"
-    :picture="picture"
-    :spaceId="spaceId"
-    :onSuccess="onCropSuccess"
-  />
 </template>
 <script setup lang="ts">
 import {
@@ -85,12 +101,28 @@ import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { EditOutlined } from '@ant-design/icons-vue'
+import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
+import ImageOutPainting from '@/components/ImageOutPainting.vue'
 
 const picture = ref<API.PictureVO>()
 const uploadType = ref<'file' | 'url'>('file')
 const router = useRouter()
 const route = useRoute()
+
+const showAIScaleButton = computed(() => {
+  const width = picture.value?.picWidth
+  const height = picture.value?.picHeight
+  let show = false
+  if (width && height) {
+    //图像分辨率：不低于512x512，不高于4096x4096
+    if ((width < 512 && height < 512) || (width > 4096 && height > 4096)) {
+      return false
+    }
+    //图像单边长度范围[512,4096]
+    return 512 <= width && width <= 4096 && 512 <= height && height <= 4096
+  }
+})
+
 //空间id
 const spaceId = computed(() => {
   return route.query.spaceId
@@ -156,7 +188,7 @@ const getOldPictiure = async () => {
     const res = await getPictureVoByIdUsingGet({ id })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
-      picture.value = data
+      picture.value = { ...data, url: data.url?.split('?')[0] }
       pictureForm.name = data.name
       pictureForm.introduction = data.introduction
       pictureForm.category = data.category
@@ -169,12 +201,22 @@ onMounted(() => {
   getOldPictiure()
 })
 const imageCropperRef = ref()
-//编辑图片
+//编辑图片============================
 const doEditPicture = () => {
   imageCropperRef.value?.openModal()
 }
 //编辑成功
 const onCropSuccess = (newPicture: API.PictureVO) => {
+  picture.value = newPicture
+}
+
+//AI扩图============================
+const imageOutPaintingRef = ref()
+const doImagePainting = () => {
+  imageOutPaintingRef.value?.openModal()
+}
+//编辑成功
+const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
   picture.value = newPicture
 }
 </script>
