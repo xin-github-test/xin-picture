@@ -15,11 +15,17 @@
           />
         </a-tooltip>
         <a-button type="primary" :href="`/add_picture?spaceId=${space.id}`">创建图片</a-button>
+        <a-button :icon="h(EditOutlined)" @click="doBatchEdit">批量编辑</a-button>
       </a-space>
     </a-flex>
     <!-- 搜索表单 -->
     <PictureSearchForm :onSearch="onSearch" />
     <div style="margin-bottom: 24px" />
+    <!-- 按颜色搜索，跟其他搜索条件独立 -->
+    <a-form-item label="按颜色搜索">
+      <color-picker format="hex" @pureColorChange="onColorChange" />
+    </a-form-item>
+
     <!-- 图片列表 -->
     <PictureList :loading="loading" :dataList="dataList" :showOp="true" :onReload="fetchData" />
     <!-- 分页 -->
@@ -31,12 +37,20 @@
       @change="onPageChange"
       style="padding-bottom: 12px; text-align: right"
     />
+    <BatchEditPictureModal
+      ref="batchEditModalRef"
+      :spaceId="id"
+      :pictureList="dataList"
+      :onSuccess="onBatchEditPictureSuccess"
+    />
   </div>
 </template>
 <script setup lang="ts">
+import { EditOutlined } from '@ant-design/icons-vue'
 import {
   listPictureVoByPageUsingPost,
   listPictureVoByPageWithCaffeCacheUsingPost,
+  searchPictureByColorUsingPost,
 } from '@/api/pictureController'
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 import { formatSize } from '@/utils'
@@ -44,6 +58,9 @@ import { message } from 'ant-design-vue'
 import { onMounted, ref, h, computed, reactive } from 'vue'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
+import { ColorPicker } from 'vue3-colorpicker'
+import 'vue3-colorpicker/style.css'
+import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
 
 interface Props {
   id: string | number
@@ -121,7 +138,35 @@ const onSearch = (newSearchParams: API.PictureQueryRequest) => {
   }
   fetchData()
 }
+//颜色搜索
+const onColorChange = async (color: string) => {
+  loading.value = true
+  const res = await searchPictureByColorUsingPost({
+    picColor: color,
+    spaceId: props.id,
+  })
+  if (res.data.code === 0 && res.data.data) {
+    const data = res.data.data ?? []
+    dataList.value = data
+    total.value = data.length
+  } else {
+    message.error('获取数据失败，' + res.data.message)
+  }
+  loading.value = false
+}
+
+//=====批量编辑图片
+const batchEditModalRef = ref()
+const onBatchEditPictureSuccess = () => {
+  fetchData()
+}
+const doBatchEdit = () => {
+  if (batchEditModalRef.value) {
+    batchEditModalRef.value?.openModal()
+  }
+}
 </script>
+
 <style scoped>
 #spaceDetailPage {
   margin-bottom: 16px;

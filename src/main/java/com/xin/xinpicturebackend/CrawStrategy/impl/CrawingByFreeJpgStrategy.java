@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 使用freejpg源，不太准确
+ */
 @StrategyType(StrategyTypeConstants.FREEJPG)
 @Slf4j
 public class CrawingByFreeJpgStrategy implements Strategy {
@@ -44,7 +47,7 @@ public class CrawingByFreeJpgStrategy implements Strategy {
         //3.解析doc内容
         Element div = document.getElementsByClass("pagefull").first().getElementsByClass("rownew33").first();
         if (ObjectUtil.isEmpty(div)) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR,"获取元素失败！");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR,"未搜索到，请换一个搜索词！");
         }
 
         //4.获取所有的图片元素

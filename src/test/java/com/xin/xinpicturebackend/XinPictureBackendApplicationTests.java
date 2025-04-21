@@ -43,4 +43,5 @@ class XinPictureBackendApplicationTests {
         List<String> list = strategyContext.crawing("壁纸", 5);
         System.out.println(list);
     }
+
 }

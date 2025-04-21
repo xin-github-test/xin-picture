@@ -10,8 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class StrategyFactory {
     private final static ConcurrentHashMap<String, Strategy> strategyMap = new ConcurrentHashMap<>();
+
     static {
-        //通过SPI机制自动扫描 /META-INF/services/接口全类名 这个文件中配置的接口实现类的全类名并反射成对象
+        //通过反射自动扫描并注册策略类
         ServiceLoader.load(Strategy.class).forEach(strategy -> {
             StrategyType annotation = strategy.getClass().getAnnotation(StrategyType.class);
             if (annotation != null) {
@@ -30,7 +31,6 @@ public class StrategyFactory {
         if (strategy == null) {
             throw new IllegalArgumentException("Unknown strategy type: " + strategyType);
         }
-
         return strategy;
     }
 }

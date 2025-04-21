@@ -2,7 +2,7 @@
   <div id="pictureDetailPage">
     <a-row :gutter="[16, 16]">
       <!-- 图片展示区 -->
-      <a-col :sm="24" :md="16" :xl="18">
+      <a-col :sm="24" :md="16" :xl="16">
         <a-card title="图片预览">
           <a-image
             style="max-height: 600px; object-fit: contain"
@@ -11,7 +11,7 @@
         </a-card>
       </a-col>
       <!-- 图片信息区 -->
-      <a-col :sm="24" :md="8" :xl="6">
+      <a-col :sm="24" :md="8" :xl="8">
         <a-card title="图片信息" style="height: 100%">
           <a-descriptions :column="1" size="middle">
             <a-descriptions-item label="作者">
@@ -49,6 +49,18 @@
             <a-descriptions-item label="大小">
               {{ formatSize(picture.picSize) }}
             </a-descriptions-item>
+            <a-descriptions-item label="主色调">
+              <a-space>
+                {{ picture.picColor ?? '-' }}
+                <div
+                  :style="{
+                    width: '20px',
+                    height: '20px',
+                    background: toHexColor(picture.picColor ?? ''),
+                  }"
+                />
+              </a-space>
+            </a-descriptions-item>
           </a-descriptions>
           <!-- 图片操作 -->
           <a-space wrap style="margin-top: 16px">
@@ -58,6 +70,9 @@
                 <DownloadOutlined />
               </template>
             </a-button>
+            <a-button :icon="h(ShareAltOutlined)" ghost type="primary" @click="doShare"
+              >分享</a-button
+            >
             <!-- 有问题，没有显示出来，即使是admin -->
             <a-button v-if="canEdit" :icon="h(EditOutlined)" type="default" @click="doEdit"
               >编辑</a-button
@@ -71,14 +86,21 @@
         </a-card>
       </a-col>
     </a-row>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 <script setup lang="ts">
 import { deletePictureUsingPost, getPictureVoByIdUsingGet } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
+import ShareModal from '@/components/ShareModal.vue'
 import { onMounted, ref, h, computed } from 'vue'
-import { downloadImage, formatSize } from '@/utils'
-import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@ant-design/icons-vue'
+import { downloadImage, formatSize, toHexColor } from '@/utils'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { useRouter } from 'vue-router'
 
@@ -148,6 +170,16 @@ const fetchPictureDetail = async () => {
 onMounted(() => {
   fetchPictureDetail()
 })
+
+//分享图片
+const shareModalRef = ref()
+const shareLink = ref('')
+const doShare = () => {
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.value.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
+  }
+}
 </script>
 <style scoped>
 #pictureDetailPage {

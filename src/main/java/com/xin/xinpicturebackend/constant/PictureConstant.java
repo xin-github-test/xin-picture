@@ -39,7 +39,7 @@ public interface PictureConstant {
     /**
      * 允许的图片类型
      */
-    List<String> ALLOW_CONTENT_TYPES = Arrays.asList("image/jpeg","image/jpg","image/png","image/webp");
+    List<String> ALLOW_CONTENT_TYPES = Arrays.asList("image/jpeg","image/jpg","image/png","image/webp","application/x-file-to-save");
 
     /**
      * 批量抓取图片数量,默认10条（不要太高）

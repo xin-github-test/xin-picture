@@ -26,30 +26,30 @@
               </template>
             </a-card-meta>
             <template v-if="showOp" #actions>
-              <a-space @click="(e) => doSearch(picture, e)">
-                <SearchOutlined />
-                搜索
-              </a-space>
-              <a-space @click="(e) => doEdit(picture, e)">
-                <EditOutlined />
-                编辑
-              </a-space>
-              <a-space @click="(e) => doDelete(picture, e)">
-                <DeleteOutlined />
-                删除
-              </a-space>
+              <ShareAltOutlined @click="(e) => doShare(picture, e)" />
+              <SearchOutlined @click="(e) => doSearch(picture, e)" />
+              <EditOutlined @click="(e) => doEdit(picture, e)" />
+              <DeleteOutlined @click="(e) => doDelete(picture, e)" />
             </template>
           </a-card>
         </a-list-item>
       </template>
     </a-list>
+    <ShareModal ref="shareModalRef" :link="shareLink" />
   </div>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons-vue'
 import { deletePictureUsingPost } from '@/api/pictureController'
 import { message } from 'ant-design-vue'
+import ShareModal from '@/components/ShareModal.vue'
+import { ref } from 'vue'
 interface Props {
   dataList?: API.PictureVO[]
   loading?: boolean
@@ -104,6 +104,18 @@ const doDelete = async (picture, e) => {
     props.onReload?.()
   } else {
     message.error('删除失败，' + res.data.message)
+  }
+}
+
+//分享图片
+const shareModalRef = ref()
+const shareLink = ref('')
+const doShare = (picture, e) => {
+  // 阻止事件冒泡
+  e.stopPropagation()
+  shareLink.value = `${window.location.protocol}//${window.location.host}/picture/${picture.id}`
+  if (shareModalRef.value) {
+    shareModalRef.value.openModal()
   }
 }
 </script>
