@@ -36,14 +36,18 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值
       logic-not-delete-value: 0 # 逻辑未删除值
 #阿里云对象存储，替换其中的密钥
-cos:
-  client:
-    accessKey: xxx
-    secretKey: xxx
-    region: xxx
-    bucket: xxx
-    endpoint: xxx
-    host: xxx
+#cos:
+#  client:
+#    accessKey: xxx
+#    secretKey: xxx
+#    region: xxx
+#    bucket: xxx
+#    endpoint: xxx
+#    host: xxx
+
+# 阿里云百炼AI配置
+#aliYunAi:
+#  apiKey: xxx
 
 #接口文档配置
 knife4j:
