@@ -4,6 +4,12 @@
       <h2>空间管理</h2>
       <a-space>
         <a-button type="primary" href="/add_space" target="_blank">+ 创建空间</a-button>
+        <a-button type="primary" ghost href="/space_analyze?queryPublic=1" target="_blank"
+          >分析公共图库</a-button
+        >
+        <a-button type="primary" ghost href="/space_analyze?queryAll=1" target="_blank"
+          >分析全部空间</a-button
+        >
       </a-space>
     </a-flex>
     <div style="margin-bottom: 16px" />
@@ -41,7 +47,6 @@
       @change="doTableChange"
     >
       <template #bodyCell="{ column, record }">
-
         <template v-if="column.dataIndex === 'spaceLevel'">
           <div>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</div>
         </template>
@@ -57,6 +62,7 @@
         </template>
         <template v-if="column.key === 'action'">
           <a-space wrap>
+            <a-button type="link" :href="`/space_analyze?spaceId=${record.id}`">分析</a-button>
             <a-button type="link" :href="`/add_space?id=${record.id}`">编辑</a-button>
             <a-popconfirm
               title="确定删除吗？"
@@ -73,10 +79,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {
-  deleteSpaceUsingPost,
-  listSpaceByPageUsingPost,
-} from '@/api/spaceController'
+import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceController'
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
@@ -118,7 +121,6 @@ const columns = [
     key: 'action',
   },
 ]
-
 
 //定义数据
 const dataList = ref<API.Space[]>([])
@@ -188,5 +190,4 @@ const doDelete = async (id: number) => {
     message.error('删除失败，' + res.data.message)
   }
 }
-
 </script>

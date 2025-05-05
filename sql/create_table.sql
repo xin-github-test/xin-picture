@@ -88,3 +88,25 @@ CREATE INDEX idx_spaceId ON picture (spaceId);
 -- 给picture 添加新列
 ALTER TABLE picture
     ADD COLUMN picColor varchar(16) null comment '图片主色调';
+
+-- 支持空间类型，添加新列
+ALTER TABLE space
+    ADD COLUMN spaceType int default 0 not null comment '空间类型：0-私有空间，1-公共空间';
+
+-- 给新列添加索引
+CREATE INDEX idx_spaceType ON space (spaceType);
+
+-- 空间成员表
+create table if not exists space_user
+(
+    id         bigint auto_increment comment 'id' primary key,
+    spaceId    bigint                             not null comment '空间 id',
+    userId     bigint                             not null comment '用户 id',
+    spaceRole  varchar(128) default 'viewer'       not null comment 'viewer/editor/admin',
+    createTime datetime    default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime datetime    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '编辑时间',
+    -- 索引设计
+    UNIQUE KEY uk_spaceId_userId (spaceId, userId), -- 唯一索引，用户在一个空间中只能拥有一个角色
+    Index idx_spaceId (spaceId),
+    Index idx_userId (userId)
+) comment '空间用户关联表' collate = utf8mb4_unicode_ci;

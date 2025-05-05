@@ -12,6 +12,7 @@ import com.xin.xinpicturebackend.constant.UserConstant;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.exception.ThrowUtils;
+import com.xin.xinpicturebackend.manager.auth.SpaceUserAuthManager;
 import com.xin.xinpicturebackend.model.dto.space.*;
 import com.xin.xinpicturebackend.model.entity.Space;
 import com.xin.xinpicturebackend.model.entity.User;
@@ -38,6 +39,8 @@ public class SpaceController {
     private UserService userService;
     @Resource
     private SpaceService spaceService;
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
 
     /**
@@ -114,8 +117,13 @@ public class SpaceController {
         //判断是否存在
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(null == space, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");
+        SpaceVO spaceVO = SpaceVO.objToVo(space);
+        //返回权限列表
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
         //返回脱敏后的数据
-        return ResultUtils.success(SpaceVO.objToVo(space));
+        return ResultUtils.success(spaceVO);
     }
 
     /**

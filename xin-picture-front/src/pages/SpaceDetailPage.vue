@@ -15,6 +15,14 @@
           />
         </a-tooltip>
         <a-button type="primary" :href="`/add_picture?spaceId=${space.id}`">创建图片</a-button>
+        <a-button
+          type="primary"
+          ghost
+          :icon="h(BarChartOutlined)"
+          :href="`/space_analyze?spaceId=${id}`"
+          target="_blank"
+          >空间分析</a-button
+        >
         <a-button :icon="h(EditOutlined)" @click="doBatchEdit">批量编辑</a-button>
       </a-space>
     </a-flex>
@@ -46,7 +54,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { EditOutlined } from '@ant-design/icons-vue'
+import { BarChartOutlined, EditOutlined } from '@ant-design/icons-vue'
 import {
   listPictureVoByPageUsingPost,
   listPictureVoByPageWithCaffeCacheUsingPost,

@@ -163,9 +163,9 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         return pictureService.getBaseMapper().selectMaps(queryWrapper)
                 .stream()
                 .map(res -> {
-                    String category = res.get("category").toString();
-                    Long count = Long.parseLong(res.get("count").toString());
-                    Long totalSize = Long.parseLong(res.get("totalSize").toString());
+                    String category = res.get("category") != null ? res.get("category").toString() : "未分类";
+                    Long count = ((Number)res.get("count")).longValue();
+                    Long totalSize = ((Number)res.get("totalSize")).longValue();
                     return new SpaceCategoryAnalyzeResponse(category, count, totalSize);
                 }).collect(Collectors.toList());
     }
@@ -254,7 +254,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
 
         //补充用户 id 查询
         Long userId = spaceUserAnalyzeRequest.getUserId();
-        queryWrapper.eq(ObjUtil.isNotEmpty(userId),"userId", loginUser.getId());
+        queryWrapper.eq(ObjUtil.isNotEmpty(userId),"userId", userId);
 
         //补充分析维度：每日、每周、每月
         String timeDimension = spaceUserAnalyzeRequest.getTimeDimension();
@@ -278,7 +278,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         //封装返回结果
         List<Map<String, Object>> queryRes = pictureService.getBaseMapper().selectMaps(queryWrapper);
         return queryRes.stream()
-                .map(map -> new SpaceUserAnalyzeResponse(map.get("period").toString(), Long.parseLong(map.get("count").toString())))
+                .map(map -> new SpaceUserAnalyzeResponse(map.get("period").toString(), ((Number)map.get("count")).longValue()))
                 .collect(Collectors.toList());
     }
 
@@ -300,7 +300,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         QueryWrapper<Space> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "spaceName", "userId", "totalSize")
                 .orderByDesc("totalSize")
-                .last("limit"+spaceRankAnalyzeRequest.getTopN());
+                .last("limit "+spaceRankAnalyzeRequest.getTopN());
 
         //封装封装结果
         return spaceService.list(queryWrapper);

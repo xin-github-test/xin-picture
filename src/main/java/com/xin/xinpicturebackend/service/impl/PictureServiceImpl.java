@@ -530,7 +530,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
 
         //权限校验
-        checkPictureAuth(loginUser, oldPicture);
+        //改为注解鉴权
+        //checkPictureAuth(loginUser, oldPicture);
 
         if (oldPicture.getSpaceId() != null) {
             //私有空间,更新额度
@@ -570,8 +571,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Long id = pictureEditRequest.getId();
         Picture oldPicture = this.getById(id);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
-        //权限校验(仅本人和管理员能修改)
-        checkPictureAuth(loginUser, oldPicture);
+        //权限校验(仅本人和管理员能修改)，已改为注解鉴权
+        //checkPictureAuth(loginUser, oldPicture);
         //补充审核字段
         fillReviewParams(picture, loginUser);
         //操作数据库
@@ -719,8 +720,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Picture picture = Optional.ofNullable(this.getById(pictureId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "图片不存在！"));
 
-        //权限校验
-        checkPictureAuth(loginUser, picture);
+        //权限校验，已改为注解鉴权
+        //checkPictureAuth(loginUser, picture);
 
         //构造请求参数
         CreateOutPaintingTaskRequest createOutPaintingTaskRequest = new CreateOutPaintingTaskRequest();

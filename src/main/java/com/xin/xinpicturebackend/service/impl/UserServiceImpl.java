@@ -10,6 +10,7 @@ import com.xin.xinpicturebackend.constant.UserConstant;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.exception.ThrowUtils;
+import com.xin.xinpicturebackend.manager.auth.StpKit;
 import com.xin.xinpicturebackend.model.dto.user.UserLoginRequest;
 import com.xin.xinpicturebackend.model.dto.user.UserQueryRequest;
 import com.xin.xinpicturebackend.model.dto.user.UserRegisterRequest;
@@ -114,6 +115,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         //4.保存用户的登陆态
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        //使用Sa-Token后，需要将登陆态往Sa-Token中保存一份(用于空间鉴权)
+        StpKit.SPACE.login(user.getId());
+        StpKit.SPACE.getSession().set(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVo(user);
     }
 
