@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.exception.ThrowUtils;
+import com.xin.xinpicturebackend.manager.sharding.DynamicShardingManager;
 import com.xin.xinpicturebackend.mapper.SpaceMapper;
 import com.xin.xinpicturebackend.model.dto.space.SpaceAddRequest;
 import com.xin.xinpicturebackend.model.dto.space.SpaceQueryRequest;
@@ -24,6 +25,7 @@ import com.xin.xinpicturebackend.service.SpaceService;
 import com.xin.xinpicturebackend.service.SpaceUserService;
 import com.xin.xinpicturebackend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -50,6 +52,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
     SpaceUserService spaceUserService;
     @Resource
     TransactionTemplate transactionTemplate;
+    @Resource
+    @Lazy
+    DynamicShardingManager dynamicShardingManager;
     @Override
     public SpaceVO getSpaceVO(Space space, HttpServletRequest request) {
         //对象封装类
@@ -229,6 +234,8 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
                     res = spaceUserService.save(spaceUser);
                     ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR, "创建团队成员记录失败！");
                 }
+                // 创建分表（仅对团队空间生效）
+                dynamicShardingManager.createSpacePictureTable(space);
                 //返回id
                 return space.getId();
             });
