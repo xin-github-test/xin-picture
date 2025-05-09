@@ -81,7 +81,7 @@ public class Picture implements Serializable {
     /**
      * 空间id
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
     /**
      * 创建时间
      */

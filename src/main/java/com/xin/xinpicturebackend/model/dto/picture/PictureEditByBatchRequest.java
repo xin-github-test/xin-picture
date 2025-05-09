@@ -16,7 +16,7 @@ public class PictureEditByBatchRequest implements Serializable {
     /**
      * 空间 id
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
 
     /**
      * 分类

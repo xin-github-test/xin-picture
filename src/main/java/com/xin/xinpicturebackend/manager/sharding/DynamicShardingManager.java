@@ -1,6 +1,8 @@
 package com.xin.xinpicturebackend.manager.sharding;
 
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.xin.xinpicturebackend.exception.BusinessException;
+import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.model.enums.SpaceLevelEnum;
 import com.xin.xinpicturebackend.model.enums.SpaceTypeEnum;
 import com.xin.xinpicturebackend.service.SpaceService;
@@ -124,6 +126,9 @@ public class DynamicShardingManager {
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("创建空间图片分表失败：{}", tableName, e);
+                //重新抛出异常，方便事务进行回滚操作
+                throw new BusinessException(ErrorCode.OPERATION_ERROR, "空间分表创建失败！");
+
             }
         }
     }

@@ -26,8 +26,8 @@ public class PictureUploadRequest implements Serializable {
      */
     private String category;
     /**
-     * 空间id
+     * 空间id,默认为0 公共空间
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
     private static final long serialVersionUID = 1L;
 }

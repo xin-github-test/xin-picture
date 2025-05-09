@@ -123,13 +123,11 @@
           </label>
           <label class="ability">
             <span>标签:</span>
-            <p><a-tag style="width: auto" color="green">默认</a-tag></p>
+            <p><em>默认</em></p>
           </label>
           <label class="ability">
             <span>评分:</span>
-            <p>
-              <a-tag style="all: unset; color: wheat; border: 1px solid wheat">默认</a-tag>
-            </p>
+            <p>4颗星</p>
           </label>
         </fieldset>
 
@@ -164,23 +162,7 @@
   </main>
 </template>
 
-<script setup lang="ts">
-// Grab the svg path lengths, so we can animate them easily.
-// These -could- be set directly into the CSS if you knew the values before hand, making this a CSS-only friendly approach to SVG animation
-
-// Ability Hatch
-// const abilityHatch = document.querySelector('#ability-hatch-crack')
-// abilityHatch.style.strokeDasharray = abilityHatch.getTotalLength()
-// abilityHatch.style.strokeDashoffset = abilityHatch.getTotalLength()
-// // console.log(`Study Path = ${abilityHatch.getTotalLength()}`);
-
-// // Helps dismiss the dialog/sidebar, allowing folks to click anywhere
-// experimentDialog.addEventListener('click', ({ target: dialog }) => {
-//   if (dialog.nodeName === 'DIALOG') {
-//     dialog.close('dismiss')
-//   }
-// })
-</script>
+<script setup lang="ts"></script>
 
 <style scoped>
 @keyframes anim-stroke {
@@ -484,6 +466,7 @@
       margin: unset;
       flex-grow: 1;
       font-size: 20px;
+      color: wheat;
     }
 
     em {

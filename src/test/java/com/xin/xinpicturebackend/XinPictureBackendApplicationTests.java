@@ -6,7 +6,11 @@ import cn.hutool.json.JSONUtil;
 import com.xin.xinpicturebackend.CrawStrategy.StrategyContext;
 import com.xin.xinpicturebackend.manager.CosManager;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 
 import javax.annotation.Resource;
@@ -42,6 +46,44 @@ class XinPictureBackendApplicationTests {
     void testCrawingByFreeJpg() {
         List<String> list = strategyContext.crawing("壁纸", 5);
         System.out.println(list);
+    }
+
+
+    class Parent {
+        private MyDao myDao;
+
+        public Parent() {
+            this.myDao = new MyDao(); // 初始化 myDao
+        }
+
+        public final void callP() {
+            System.out.println("父类final方法");
+        }
+
+        public MyDao getMyDao() {
+            return myDao;  // 用于测试代理时的 myDao
+        }
+    }
+
+    class MyDao {
+
+    }
+
+    @Test
+    void testFinalMethod() {
+        // 创建目标对象
+        Parent target = new Parent();
+
+        // 创建 CGLIB 代理对象
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+        proxyFactory.setProxyTargetClass(true); // 使用 CGLIB 代理
+
+        // 获取代理对象
+        Parent proxy = (Parent) proxyFactory.getProxy();
+
+        // 获取原始目标对象
+        Class<?> aClass = AopProxyUtils.ultimateTargetClass(proxy);
+
     }
 
 }

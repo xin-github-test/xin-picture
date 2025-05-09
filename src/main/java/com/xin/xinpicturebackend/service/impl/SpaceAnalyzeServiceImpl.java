@@ -55,7 +55,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         } else {
             // 分析特定空间的图片，仅本人或管理员可访问
             Long spaceId = spaceAnalyzeRequest.getSpaceId();
-            ThrowUtils.throwIf(spaceId == null, ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(spaceId == 0, ErrorCode.PARAMS_ERROR);
             //校验空间是否存在
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");
@@ -125,7 +125,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
             return spaceUsageAnalyzeResponse;
         } else {
             Long spaceId = spaceUsageAnalyzeRequest.getSpaceId();
-            ThrowUtils.throwIf(spaceId == null, ErrorCode.PARAMS_ERROR);
+            ThrowUtils.throwIf(spaceId == 0, ErrorCode.PARAMS_ERROR);
             //分析特定空间的图库
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");

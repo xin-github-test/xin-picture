@@ -96,7 +96,7 @@ public class SpaceController {
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Space> getSpaceById(long id, HttpServletRequest request) {
-        if (ObjectUtil.isEmpty(id) || id <= 0) {
+        if (ObjectUtil.isEmpty(id) || id < 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         //判断是否存在
@@ -113,7 +113,7 @@ public class SpaceController {
      */
     @GetMapping("/get/vo")
     public BaseResponse<SpaceVO> getSpaceVOById(long id, HttpServletRequest request) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(id < 0, ErrorCode.PARAMS_ERROR);
         //判断是否存在
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(null == space, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");

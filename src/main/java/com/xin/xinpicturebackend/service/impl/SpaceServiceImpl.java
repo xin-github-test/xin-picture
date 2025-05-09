@@ -205,8 +205,9 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
         //3.权限校验
         Long userId = loginUser.getId();
         space.setUserId(userId);
+        boolean isAdmin = userService.isAdmin(loginUser);
         //创建的空间级别不是普通，且创建人也不是管理员，则提示权限不足
-        if (SpaceLevelEnum.COMMON.getValue() != space.getSpaceLevel() && !userService.isAdmin(loginUser)) {
+        if (SpaceLevelEnum.COMMON.getValue() != space.getSpaceLevel() && !isAdmin) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"无权限创建该级别空间！");
         }
         //4.控制同一个用户只能创建一个空间, 以及一个团队空间
@@ -214,13 +215,16 @@ public class SpaceServiceImpl extends ServiceImpl<SpaceMapper, Space>
         synchronized (lock) {
             //手动控制事务
             Long newSpaceId = transactionTemplate.execute(status -> {
-                //判断是否已经创建了空间
-                boolean exists = this.lambdaQuery()
-                        .eq(Space::getUserId, userId)
-                        .eq(Space::getSpaceType, space.getSpaceType())
-                        .exists();
-                //已经创建，则不能再创建了
-                ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户每类空间只能创建一个！");
+                //非管理员只能创建一个空间
+                if (!isAdmin) {
+                    //判断是否已经创建了空间
+                    boolean exists = this.lambdaQuery()
+                            .eq(Space::getUserId, userId)
+                            .eq(Space::getSpaceType, space.getSpaceType())
+                            .exists();
+                    //已经创建，则不能再创建了
+                    ThrowUtils.throwIf(exists, ErrorCode.OPERATION_ERROR, "每个用户每类空间只能创建一个！");
+                }
                 //创建
                 boolean res = this.save(space);
                 ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR, "保存空间失败！");

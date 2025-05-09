@@ -121,7 +121,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //3.上传图片,得到图片信息
         String uploadPathPrefix;
 
-        if (spaceId == null) {
+        if (spaceId == 0) {
             //按照用户id划分目录,同时 public 代表可以公共访问的图片
             uploadPathPrefix = String.format("public/%s",loginUser.getId());
         } else {
@@ -588,7 +588,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     @Override
     public void checkPictureAuth(User loginUser, Picture picture) {
         Long spaceId = picture.getSpaceId();
-        if (spaceId == null) {
+        if (spaceId == 0) {
             //公共图库，仅本人和管理员可操作
             if (!picture.getUserId().equals(loginUser.getId()) && userService.isAdmin(loginUser)) {
                 throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
@@ -611,7 +611,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     @Override
     public List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser) {
         // 1.校验参数
-        ThrowUtils.throwIf(spaceId == null || StrUtil.isBlank(picColor), ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(spaceId == 0 || StrUtil.isBlank(picColor), ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH_ERROR);
         // 2.校验权限
         Space space = spaceService.getById(spaceId);
@@ -666,7 +666,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         List<String> tags = pictureEditByBatchRequest.getTags();
         String nameRule = pictureEditByBatchRequest.getNameRule();
         ThrowUtils.throwIf(CollUtil.isEmpty(pictureIdList), ErrorCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(spaceId == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(spaceId == 0, ErrorCode.PARAMS_ERROR);
         ThrowUtils.throwIf(StrUtil.isBlank(nameRule), ErrorCode.PARAMS_ERROR);
 
         //2.校验空间权限

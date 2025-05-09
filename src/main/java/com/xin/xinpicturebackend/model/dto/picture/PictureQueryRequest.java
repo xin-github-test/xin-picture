@@ -65,7 +65,7 @@ public class PictureQueryRequest extends PageRequest implements Serializable {
     /**
      * 空间id
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
     /**
      * 是否只查询spaceId为null的数据
      */

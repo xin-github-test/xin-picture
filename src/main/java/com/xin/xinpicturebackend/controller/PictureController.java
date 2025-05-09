@@ -232,7 +232,7 @@ public class PictureController {
 
         //空间权限校验
         Long spaceId = pictureQueryRequest.getSpaceId();
-        if (spaceId == null) {
+        if (spaceId == 0) {
             //公开图库
             //普通用户默认只能看到 审核通过 的图片
             pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
