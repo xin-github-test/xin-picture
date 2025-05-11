@@ -33,7 +33,9 @@
           target="_blank"
           >空间分析</a-button
         >
-        <a-button :icon="h(EditOutlined)" @click="doBatchEdit">批量编辑</a-button>
+        <a-button v-if="canEditPicture" :icon="h(EditOutlined)" @click="doBatchEdit"
+          >批量编辑</a-button
+        >
       </a-space>
     </a-flex>
     <!-- 搜索表单 -->
