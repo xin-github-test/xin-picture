@@ -79,7 +79,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space> imp
         }
         //分析特定空间
         Long spaceId = spaceAnalyzeRequest.getSpaceId();
-        if (spaceId != null) {
+        if (spaceId != 0) {
             queryWrapper.eq("spaceId", spaceId);
             return;
         }

@@ -175,7 +175,7 @@ public class PictureController {
         //空间校验
         Long spaceId = picture.getSpaceId();
         Space space = null;
-        if (spaceId != null) {
+        if (spaceId != 0) {
             //使用sa-token 编程式鉴权
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH_ERROR, "无权限查看！");
@@ -186,7 +186,7 @@ public class PictureController {
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");
         }
         //图片未过审(公共图片),若是私有空间中的图片，无需过审
-        if(picture.getSpaceId() == null && !picture.getReviewStatus().equals(PictureReviewStatusEnum.PASS.getValue())) {
+        if(picture.getSpaceId() == 0 && !picture.getReviewStatus().equals(PictureReviewStatusEnum.PASS.getValue())) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR,"图片未过审！");
         }
 
@@ -236,7 +236,6 @@ public class PictureController {
             //公开图库
             //普通用户默认只能看到 审核通过 的图片
             pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
-            pictureQueryRequest.setNullSpaceId(true);
         } else {
             //使用sa-token 编程式鉴权
             boolean hasPermission = StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);

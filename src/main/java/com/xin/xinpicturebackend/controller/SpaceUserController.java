@@ -7,14 +7,17 @@ import com.xin.xinpicturebackend.common.ResultUtils;
 import com.xin.xinpicturebackend.exception.BusinessException;
 import com.xin.xinpicturebackend.exception.ErrorCode;
 import com.xin.xinpicturebackend.exception.ThrowUtils;
+import com.xin.xinpicturebackend.manager.auth.StpKit;
 import com.xin.xinpicturebackend.manager.auth.annotation.SaSpaceCheckPermission;
 import com.xin.xinpicturebackend.manager.auth.model.SpaceUserPermissionConstant;
 import com.xin.xinpicturebackend.model.dto.spaceuser.SpaceUserAddRequest;
 import com.xin.xinpicturebackend.model.dto.spaceuser.SpaceUserEditRequest;
 import com.xin.xinpicturebackend.model.dto.spaceuser.SpaceUserQueryRequest;
+import com.xin.xinpicturebackend.model.entity.Space;
 import com.xin.xinpicturebackend.model.entity.SpaceUser;
 import com.xin.xinpicturebackend.model.entity.User;
 import com.xin.xinpicturebackend.model.vo.SpaceUserVO;
+import com.xin.xinpicturebackend.service.SpaceService;
 import com.xin.xinpicturebackend.service.SpaceUserService;
 import com.xin.xinpicturebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/spaceUser")
@@ -38,6 +42,8 @@ public class SpaceUserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private SpaceService spaceService;
 
     /**
      * 添加成员到空间
@@ -64,8 +70,16 @@ public class SpaceUserController {
         // 判断是否存在
         SpaceUser oldSpaceUser = spaceUserService.getById(id);
         ThrowUtils.throwIf(oldSpaceUser == null, ErrorCode.NOT_FOUND_ERROR);
+        //判断是否为创建者
+        //通过userId查询space表
+        Space space = spaceService.getById(oldSpaceUser.getSpaceId());
+        if (space != null) {
+            ThrowUtils.throwIf(Objects.equals(space.getUserId(), oldSpaceUser.getUserId()),ErrorCode.OPERATION_ERROR,"不能删除创建者！");
+        }
         // 操作数据库
         boolean result = spaceUserService.removeById(id);
+        //Sa-Token下线
+        StpKit.SPACE.logout(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }

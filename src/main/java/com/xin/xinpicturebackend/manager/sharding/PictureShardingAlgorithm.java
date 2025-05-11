@@ -9,11 +9,11 @@ import java.util.Collection;
 import java.util.Properties;
 
 public class PictureShardingAlgorithm implements StandardShardingAlgorithm<Long> {
-
     @Override
     public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Long> preciseShardingValue) {
         Long spaceId = preciseShardingValue.getValue();
         String logicTableName = preciseShardingValue.getLogicTableName();
+        System.out.println("路由算法开始====");
         // spaceId 为 null 表示查询所有图片
         if (spaceId == 0) {
             return logicTableName;

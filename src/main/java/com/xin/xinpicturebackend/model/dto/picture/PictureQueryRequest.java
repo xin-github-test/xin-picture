@@ -69,7 +69,7 @@ public class PictureQueryRequest extends PageRequest implements Serializable {
     /**
      * 是否只查询spaceId为null的数据
      */
-    private boolean nullSpaceId;
+//    private boolean nullSpaceId;
     /**
      * 审核状态：0-待审核; 1-通过; 2-拒绝
      */

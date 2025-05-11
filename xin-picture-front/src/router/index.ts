@@ -14,6 +14,7 @@ import SpaceDetailPage from '@/pages/SpaceDetailPage.vue'
 import SearchPicturePage from '@/pages/SearchPicturePage.vue'
 import MyCard from '@/components/MyCard.vue'
 import SpaceAnalyzePage from '@/pages/SpaceAnalyzePage.vue'
+import SpaceUserManagerPage from '@/pages/admin/SpaceUserManagerPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +53,12 @@ const router = createRouter({
       path: '/admin/spaceManage',
       name: '空间管理',
       component: SpaceManagePage,
+    },
+    {
+      path: '/spaceUserManager/:id',
+      name: '空间成员管理',
+      component: SpaceUserManagerPage,
+      props: true,
     },
     {
       path: '/add_space',

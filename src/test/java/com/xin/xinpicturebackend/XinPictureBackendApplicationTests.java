@@ -68,6 +68,9 @@ class XinPictureBackendApplicationTests {
     class MyDao {
 
     }
+    class child extends Parent {
+        private MyDao myDao;
+    }
 
     @Test
     void testFinalMethod() {

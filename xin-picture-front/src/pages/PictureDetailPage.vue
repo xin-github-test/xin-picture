@@ -75,7 +75,7 @@
               >编辑</a-button
             >
             <a-popconfirm title="确定删除吗？" ok-text="确定" cancel-text="取消">
-              <a-button v-if="canEdit" :icon="h(DeleteOutlined)" danger @click="doDelete"
+              <a-button v-if="canDelete" :icon="h(DeleteOutlined)" danger @click="doDelete"
                 >删除</a-button
               >
             </a-popconfirm>
@@ -100,6 +100,7 @@ import {
 } from '@ant-design/icons-vue'
 import { useLoginUserStore } from '@/stores/useLoginUserStore'
 import { useRouter } from 'vue-router'
+import { SPACE_PERMISSION_ENUM } from '@/constants/space'
 
 interface Props {
   id: string | number
@@ -108,17 +109,17 @@ const loginUserStore = useLoginUserStore()
 const props = defineProps<Props>()
 const picture = ref<API.PictureVO>({})
 
-//是否具有编辑权限
-const canEdit = computed(() => {
-  const loginUser = loginUserStore.loginUser
-  //校验权限
-  if (!loginUser.id) {
-    return false
-  }
-  //仅管理员或本人可编辑
-  const user = picture.value.user || {}
-  return loginUser.id === user.id || loginUser.userRole === 'admin'
-})
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (picture.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canEdit = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDelete = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
+
 //删除
 const doDelete = async () => {
   const id = picture.value.id

@@ -188,8 +188,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (null == userObj) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR,"未登录");
         }
-        //移除登陆态
+        //移除登陆态(spring-session默认延迟同步到redis,若是需要立即生效，需要对springSession进行配置)
         request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+        //移除sa-token登陆态
+        StpKit.SPACE.logout(((User)userObj).getId());
+        StpKit.SPACE.getSession().delete(UserConstant.USER_LOGIN_STATE);
         return true;
     }
 

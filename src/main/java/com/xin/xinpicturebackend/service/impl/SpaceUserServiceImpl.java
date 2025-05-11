@@ -110,7 +110,7 @@ public class SpaceUserServiceImpl extends ServiceImpl<SpaceUserMapper, SpaceUser
         }
         // 关联查询空间信息
         Long spaceId = spaceUser.getSpaceId();
-        if (spaceId != null && spaceId > 0) {
+        if (spaceId != 0 && spaceId > 0) {
             Space space = spaceService.getById(spaceId);
             SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
             spaceUserVO.setSpace(spaceVO);

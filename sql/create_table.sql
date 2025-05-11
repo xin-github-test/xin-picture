@@ -91,7 +91,7 @@ ALTER TABLE picture
 
 -- 支持空间类型，添加新列
 ALTER TABLE space
-    ADD COLUMN spaceType int default 0 not null comment '空间类型：0-私有空间，1-公共空间';
+    ADD COLUMN spaceType int default 0 not null comment '空间类型：0-私有空间，1-团队空间';
 
 -- 给新列添加索引
 CREATE INDEX idx_spaceType ON space (spaceType);

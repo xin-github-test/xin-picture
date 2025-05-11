@@ -84,7 +84,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         ThrowUtils.throwIf(pictureUploadRequest == null, ErrorCode.PARAMS_ERROR);
         //校验空间是否存在
         Long spaceId = pictureUploadRequest.getSpaceId();
-        if (spaceId != null) {
+        if (spaceId != 0) {
             Space space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在！");
             //校验是否有权限，仅空间管理员能上传
@@ -112,7 +112,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             }
 
             //此时再校验，更新时的spaceId和数据库中老数据的spaceId是否一致
-            if (spaceId != null && !oldPicture.getSpaceId().equals(spaceId)) {
+            if (spaceId != 0 && !oldPicture.getSpaceId().equals(spaceId)) {
                 throw new BusinessException(ErrorCode.PARAMS_ERROR, "更新时的空间ID有误！");
             }
             spaceId = oldPicture.getSpaceId();
@@ -281,7 +281,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         String reviewMessage = pictureQueryRequest.getReviewMessage();
         Long reviewerId = pictureQueryRequest.getReviewerId();
         Long spaceId = pictureQueryRequest.getSpaceId();
-        boolean nullSpaceId = pictureQueryRequest.isNullSpaceId();
         //封装queryWrapper
         //从多字段中搜索
         if (StrUtil.isNotBlank(searchText)) {
@@ -297,7 +296,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         queryWrapper.eq(ObjectUtil.isNotEmpty(id), "id",id);
         queryWrapper.eq(ObjectUtil.isNotEmpty(userId), "userId", userId);
         queryWrapper.eq(ObjectUtil.isNotEmpty(spaceId), "spaceId", spaceId);
-        queryWrapper.isNull(nullSpaceId, "spaceId");
         queryWrapper.like(StrUtil.isNotBlank(name), "name", name);
         queryWrapper.like(StrUtil.isNotBlank(introduction), "introduction", introduction);
         queryWrapper.like(StrUtil.isNotBlank(picFormat), "picFormat", picFormat);
@@ -494,15 +492,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Integer count = pictureUploadByBatchRequest.getCount();
         ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多抓取30条！");
 
-        List<String> picUrlList = strategyContext.crawing(searchText, count);
+        //4.根据url批量上传图片并返回成功上传的图片的数量(异步上传，前端无需等待)
+        //TODO 可以将失败的任务记录下来，后续重新发起
+        CompletableFuture.runAsync(() -> uploadPicsByUrl(pictureUploadByBatchRequest, searchText, count, loginUser))
+                .thenAccept(res -> System.out.println("图片抓取任务完成！"))
+                .exceptionally(ex -> {System.out.println("图片异步上传失败！");return null;});
 
-        //4.根据url批量上传图片并返回成功上传的图片的数量
-        CompletableFuture<Integer> future = uploadPicsByUrl(picUrlList, pictureUploadByBatchRequest, loginUser);
-        try {
-            return future.get();
-        } catch (Exception e) {
-            throw new BusinessException(ErrorCode.OPERATION_ERROR,"图片异步上传失败！");
-        }
+        // 返回默认值或其他需要返回的值
+        return 1;
     }
     /**
      * 清理图片
@@ -575,6 +572,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //checkPictureAuth(loginUser, oldPicture);
         //补充审核字段
         fillReviewParams(picture, loginUser);
+        //由于spaceId为分片字段，不允许修改
+        picture.setSpaceId(null);
         //操作数据库
         boolean res = this.updateById(picture);
         ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR,"图片更新失败！");
@@ -691,6 +690,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
             if (CollUtil.isNotEmpty(tags)) {
                 picture.setTags(JSONUtil.toJsonStr(tags));
             }
+            //去除spaceId
+            picture.setSpaceId(null);
         });
 
         // 5.批量重命名
@@ -758,12 +759,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
     /**
      * 根据url批量上传图片到oss（异步 + 流）
      *
-     * @param picUrlList                  待上传的图片url列表
      * @param pictureUploadByBatchRequest 前端上传图片所携带的参数
+     * @param searchText 搜索词
+     * @param count       搜索数量
      * @param loginUser                   当前登录的用户
      * @return 返回成功上传的图片的数量
      */
-    public CompletableFuture<Integer> uploadPicsByUrl(List<String> picUrlList, PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
+    public void uploadPicsByUrl(PictureUploadByBatchRequest pictureUploadByBatchRequest, String searchText, Integer count, User loginUser) {
+        List<String> picUrlList = strategyContext.crawing(searchText, count);
         String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
         if (StrUtil.isBlank(namePrefix)) {
             //如果未自定义名称，设置默认值(搜索词)
@@ -774,33 +777,29 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
 
         // 使用流来异步上传每个图片
         String finalNamePrefix = namePrefix;
-        List<CompletableFuture<Void>> futures = picUrlList.stream()
-                .map(fileUrl -> CompletableFuture.runAsync(() -> {
-                   // 上传图片
-                   PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
-                   pictureUploadRequest.setFileUrl(fileUrl);
-                   // 设置默认名称
-                   pictureUploadRequest.setPicName(finalNamePrefix + "-" + (picUrlList.indexOf(fileUrl) + 1));
-                   // 设置标签和分类
-                   if (StrUtil.isNotBlank(tags)) {
-                       pictureUploadRequest.setTags(tags);
-                   }
-                   if (StrUtil.isNotBlank(category)) {
-                       pictureUploadRequest.setCategory(category);
-                   }
-                   try {
-                       //上传图片
-                       PictureVO pictureVO = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
-                       log.info("图片上传成功，id = {}", pictureVO.getId());
-                   } catch (Exception e) {
-                       // 上传失败，跳过
-                       log.error("图片上传失败，", e);
-                   }
-               }))
-                .collect(Collectors.toList());
-        // 使用 allOf 等待所有的异步任务完成
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(v -> (int) futures.stream().filter(CompletableFuture::isDone).count());
+
+        picUrlList.forEach(fileUrl  -> {
+           // 上传图片
+           PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
+           pictureUploadRequest.setFileUrl(fileUrl);
+           // 设置默认名称
+           pictureUploadRequest.setPicName(finalNamePrefix + "-" + (picUrlList.indexOf(fileUrl) + 1));
+           // 设置标签和分类
+           if (StrUtil.isNotBlank(tags)) {
+               pictureUploadRequest.setTags(tags);
+           }
+           if (StrUtil.isNotBlank(category)) {
+               pictureUploadRequest.setCategory(category);
+           }
+           try {
+               //上传图片
+               PictureVO pictureVO = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+               log.info("图片上传成功，id = {}", pictureVO.getId());
+           } catch (Exception e) {
+               // 上传失败，跳过
+               log.error("图片上传失败，", e);
+           }
+       });
     }
 }
 

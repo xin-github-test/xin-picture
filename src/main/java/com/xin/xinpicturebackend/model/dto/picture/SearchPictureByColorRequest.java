@@ -15,7 +15,7 @@ public class SearchPictureByColorRequest implements Serializable {
     /**
      * 空间 id
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
 
     private static final long serialVersionUID = 1L;
 }

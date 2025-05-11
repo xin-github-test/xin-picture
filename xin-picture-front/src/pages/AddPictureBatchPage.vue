@@ -74,7 +74,7 @@ const handleSubmit = async (values: any) => {
   loading.value = true
   const res = await uploadPictureByBatchUsingPost({ ...formData })
   if (res.data.code === 0 && res.data.data) {
-    message.success(`创建成功,共${res.data.data}条`)
+    message.success(`创建成功`)
     //跳转到主页
     router.push(`/`)
   } else {

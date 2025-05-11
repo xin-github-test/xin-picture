@@ -2,7 +2,7 @@
   <div id="spaceDetailPage">
     <!-- 空间信息 -->
     <a-flex justify="space-between">
-      <h2>{{ space.spaceName }}(私有空间)</h2>
+      <h2>{{ space.spaceName }} {{ SPACE_TYPE_MAP[space.spaceType] }}</h2>
       <a-space size="middle">
         <a-tooltip
           :title="`占用空间 ${formatSize(space.totalSize)} / ${formatSize(space.maxSize)}`"
@@ -14,8 +14,18 @@
             :width="80"
           />
         </a-tooltip>
-        <a-button type="primary" :href="`/add_picture?spaceId=${space.id}`">创建图片</a-button>
+        <a-button v-if="canUploadPicture" type="primary" :href="`/add_picture?spaceId=${space.id}`"
+          >创建图片</a-button
+        >
         <a-button
+          v-if="canManageSpaceUser"
+          type="primary"
+          ghost
+          :href="`/spaceUserManager/${space.id}`"
+          >成员管理</a-button
+        >
+        <a-button
+          v-if="canManageSpaceUser"
           type="primary"
           ghost
           :icon="h(BarChartOutlined)"
@@ -35,7 +45,14 @@
     </a-form-item>
 
     <!-- 图片列表 -->
-    <PictureList :loading="loading" :dataList="dataList" :showOp="true" :onReload="fetchData" />
+    <PictureList
+      :canEdit="canDeletePicture"
+      :canDelete="canDeletePicture"
+      :loading="loading"
+      :dataList="dataList"
+      :showOp="true"
+      :onReload="fetchData"
+    />
     <!-- 分页 -->
     <a-pagination
       v-if="dataList.length > 0"
@@ -63,18 +80,32 @@ import {
 import { getSpaceVoByIdUsingGet } from '@/api/spaceController'
 import { formatSize } from '@/utils'
 import { message } from 'ant-design-vue'
-import { onMounted, ref, h, computed, reactive } from 'vue'
+import { onMounted, ref, h, computed, reactive, watch } from 'vue'
 import PictureList from '@/components/PictureList.vue'
 import PictureSearchForm from '@/components/PictureSearchForm.vue'
 import { ColorPicker } from 'vue3-colorpicker'
 import 'vue3-colorpicker/style.css'
 import BatchEditPictureModal from '@/components/BatchEditPictureModal.vue'
+import { SPACE_PERMISSION_ENUM, SPACE_TYPE_MAP } from '@/constants/space'
 
 interface Props {
   id: string | number
 }
 const props = defineProps<Props>()
 const space = ref<API.SpaceVO>({})
+
+// 通用权限检查函数
+function createPermissionChecker(permission: string) {
+  return computed(() => {
+    return (space.value.permissionList ?? []).includes(permission)
+  })
+}
+
+// 定义权限检查
+const canManageSpaceUser = createPermissionChecker(SPACE_PERMISSION_ENUM.SPACE_USER_MANAGE)
+const canUploadPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_UPLOAD)
+const canEditPicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_EDIT)
+const canDeletePicture = createPermissionChecker(SPACE_PERMISSION_ENUM.PICTURE_DELETE)
 
 //获取空间详情
 const fetchSpaceDetail = async () => {
@@ -173,6 +204,15 @@ const doBatchEdit = () => {
     batchEditModalRef.value?.openModal()
   }
 }
+
+//当空间id发生变化时，重新获取页面数据
+watch(
+  () => props.id,
+  (newSpaceId) => {
+    fetchSpaceDetail()
+    fetchData()
+  },
+)
 </script>
 
 <style scoped>

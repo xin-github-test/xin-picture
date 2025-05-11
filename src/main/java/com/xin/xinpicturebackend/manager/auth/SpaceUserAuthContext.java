@@ -25,7 +25,7 @@ public class SpaceUserAuthContext {
     /**
      * 空间 ID
      */
-    private Long spaceId;
+    private Long spaceId = 0L;
 
     /**
      * 空间用户 ID

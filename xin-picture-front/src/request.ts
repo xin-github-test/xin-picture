@@ -2,7 +2,7 @@ import { message } from 'ant-design-vue'
 import axios from 'axios'
 //创建axios实例
 const myAxios = axios.create({
-  baseURL: 'http://localhost:8081/',
+  baseURL: 'http://localhost:8080/',
   timeout: 60000, //超时时间
   withCredentials: true, //是否允许携带cookie
 })

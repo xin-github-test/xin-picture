@@ -28,6 +28,15 @@
           allow-clear
         ></a-select>
       </a-form-item>
+      <a-form-item name="spaceType" lable="空间类别">
+        <a-select
+          style="min-width: 180px"
+          v-model:value="searchParams.spaceType"
+          placeholder="请选择空间类别"
+          :options="SPACE_TYPE_OPTIONS"
+          allow-clear
+        ></a-select>
+      </a-form-item>
       <a-form-item lable="用户 id">
         <a-input v-model:value="searchParams.userId" allow-clear placeholder="请输入用户 id">
         </a-input>
@@ -49,6 +58,9 @@
       <template #bodyCell="{ column, record }">
         <template v-if="column.dataIndex === 'spaceLevel'">
           <div>{{ SPACE_LEVEL_MAP[record.spaceLevel] }}</div>
+        </template>
+        <template v-if="column.dataIndex === 'spaceType'">
+          <div>{{ SPACE_TYPE_MAP[record.spaceType] }}</div>
         </template>
         <template v-if="column.dataIndex === 'spaceUseInfo'">
           <div>大小：{{ formatSize(record.totalSize) }} / {{ formatSize(record.maxSize) }}</div>
@@ -83,7 +95,12 @@ import { deleteSpaceUsingPost, listSpaceByPageUsingPost } from '@/api/spaceContr
 import { message } from 'ant-design-vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import dayjs from 'dayjs'
-import { SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS } from '@/constants/space'
+import {
+  SPACE_LEVEL_MAP,
+  SPACE_LEVEL_OPTIONS,
+  SPACE_TYPE_MAP,
+  SPACE_TYPE_OPTIONS,
+} from '@/constants/space'
 import { formatSize } from '@/utils'
 const columns = [
   {
@@ -98,6 +115,10 @@ const columns = [
   {
     title: '空间级别',
     dataIndex: 'spaceLevel',
+  },
+  {
+    title: '空间类别',
+    dataIndex: 'spaceType',
   },
   {
     title: '使用情况',

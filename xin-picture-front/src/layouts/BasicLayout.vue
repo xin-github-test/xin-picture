@@ -7,7 +7,7 @@
         <a-layout-content class="content"><RouterView /></a-layout-content>
       </a-layout>
       <a-layout-footer class="footer">
-        <a href="https://blog.xinmix.ddns-ip.net" target="_blank">View the author Blog! </a>
+        <a href="https://blog.xintest.dpdns.org" target="_blank">View the author Blog! </a>
         <img src="@/assets/svg/web.svg" style="width: 70px; height: 40px" />
       </a-layout-footer>
     </a-layout>
