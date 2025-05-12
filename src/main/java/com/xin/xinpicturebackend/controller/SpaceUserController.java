@@ -134,6 +134,12 @@ public class SpaceUserController {
         long id = spaceUserEditRequest.getId();
         SpaceUser oldSpaceUser = spaceUserService.getById(id);
         ThrowUtils.throwIf(oldSpaceUser == null, ErrorCode.NOT_FOUND_ERROR);
+        //判断是否为创建者
+        //通过userId查询space表
+        Space space = spaceService.getById(oldSpaceUser.getSpaceId());
+        if (space != null) {
+            ThrowUtils.throwIf(Objects.equals(space.getUserId(), oldSpaceUser.getUserId()),ErrorCode.OPERATION_ERROR,"不能修改创建者权限！");
+        }
         // 操作数据库
         boolean result = spaceUserService.updateById(spaceUser);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);

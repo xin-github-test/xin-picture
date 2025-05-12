@@ -37,6 +37,7 @@
         </template>
         <template v-if="column.dataIndex === 'spaceRole'">
           <a-select
+            :disabled="record.userId == record.space.userId"
             v-model:value="record.spaceRole"
             :options="SPACE_ROLE_OPTIONS"
             @change="(value) => editSpaceRole(value, record)"
@@ -46,8 +47,8 @@
           {{ dayjs(record.createTime).format('YYYY-MM-DD HH:mm:ss') }}
         </template>
         <template v-else-if="column.key === 'action'">
-          <a-space wrap>
-            <a-button type="link" danger @click="doDelete(record.id)">删除</a-button>
+          <a-space wrap v-if="record.userId != record.space.userId">
+            <a-button type="link" danger @click="doDelete(record.id)">退队</a-button>
           </a-space>
         </template>
       </template>

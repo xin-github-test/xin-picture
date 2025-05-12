@@ -1,5 +1,6 @@
 package com.xin.xinpicturebackend.manager.auth.annotation;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.strategy.SaAnnotationStrategy;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ public class SaTokenConfigure implements WebMvcConfigurer {
     // 注册 Sa-Token 拦截器，打开注解式鉴权功能
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        System.out.println("sa-token拦截");
         // 注册 Sa-Token 拦截器，打开注解式鉴权功能
         registry.addInterceptor(new SaInterceptor()).addPathPatterns("/**");
     }
