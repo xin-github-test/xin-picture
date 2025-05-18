@@ -87,7 +87,7 @@ const doEdit = (picture, e) => {
   e.stopPropagation()
   //跳转时携带spaceId
   router.push({
-    path: '/picture/edit',
+    path: '/add_picture',
     query: {
       id: picture.id,
       spaceId: picture.spaceId,

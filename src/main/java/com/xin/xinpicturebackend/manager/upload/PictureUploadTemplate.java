@@ -57,6 +57,8 @@ public abstract class PictureUploadTemplate {
             return buildResult(originalFilename, uploadPath);
         }catch (Exception e) {
             log.error("图片上传到对象存储失败",e);
+            //删除上传的图片
+            cosManager.deleteObject(uploadPath);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
 
         } finally {

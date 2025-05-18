@@ -72,6 +72,7 @@ public class FileManager {
             return uploadPictureResult;
         }catch (Exception e) {
             log.error("图片上传到对象存储失败",e);
+            cosManager.deleteObject(uploadPath);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
 
         } finally {
@@ -111,6 +112,7 @@ public class FileManager {
             return uploadPictureResult;
         } catch (Exception e) {
             log.error("图片上传到对象存储失败",e);
+            cosManager.deleteDir(uploadPath);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
         } finally {
             this.deleteTempFile(file);

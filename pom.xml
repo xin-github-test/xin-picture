@@ -42,7 +42,19 @@
             <artifactId>hutool-all</artifactId>
             <version>5.8.26</version>
         </dependency>
-<!--接口文档：https://doc.xiaominfo.com/docs/quick-start-->
+        <!-- websocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <!-- 高性能无锁队列 -->
+        <dependency>
+            <groupId>com.lmax</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
+        <!--接口文档：https://doc.xiaominfo.com/docs/quick-start-->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>

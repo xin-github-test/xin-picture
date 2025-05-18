@@ -136,6 +136,8 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         pictureService.fillReviewParams(picture, loginUser);
         //操作数据库
+        //不能更新spaceId
+        picture.setSpaceId(null);
         boolean res = pictureService.updateById(picture);
         ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR,"图片更新失败！");
         return ResultUtils.success(true);

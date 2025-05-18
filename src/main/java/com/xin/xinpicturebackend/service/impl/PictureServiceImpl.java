@@ -176,6 +176,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         Long finalSpaceId = spaceId;
         transactionTemplate.execute(status -> {
             //新增或者更新 (根据是否有id自动确定是新增还是更新)
+            if (picture.getId() != null) {picture.setSpaceId(null);}
             boolean res = this.saveOrUpdate(picture);
             ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR, "图片上传失败,数据库操作失败!");
             //更新空间使用额度 （私有空间才更新额度）
@@ -372,6 +373,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         //设置默认值
         updatePicture.setReviewerId(loginUser.getId());
         updatePicture.setReviewTime(new Date());
+        //不能更新spaceId
+        updatePicture.setSpaceId(null);
         boolean res = this.updateById(updatePicture);
         ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR);
     }
@@ -698,6 +701,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture>
         fillPictureWithNameRule(pictureList, nameRule);
 
         // 6.更新数据库
+        pictureList.forEach(picture -> picture.setSpaceId(null));
         boolean res = this.updateBatchById(pictureList);
         ThrowUtils.throwIf(!res, ErrorCode.OPERATION_ERROR,"批量编辑失败！");
     }

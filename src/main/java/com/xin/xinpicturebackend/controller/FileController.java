@@ -50,6 +50,7 @@ public class FileController {
             return ResultUtils.success(filePath);
         }catch (Exception e) {
             log.error("file upload error, filePath = {}",filePath,e);
+            cosManager.deleteObject(filePath);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
 
         } finally {
