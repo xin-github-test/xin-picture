@@ -96,11 +96,11 @@ const openModal = () => {
 }
 const closeModal = () => {
   visible.value = false
+  message.info('已退出会话！')
+  editingUser.value = undefined
   //关闭弹窗，同时断开 websocket 连接
   if (websocket) {
     //执行退出编辑
-    exitEdit()
-    editingUser.value = undefined
     websocket.disconnect()
   }
 }
@@ -149,8 +149,7 @@ const handleUpload = async ({ file }: any) => {
       props.onSuccess?.(picture)
       //发送通知给其他用户
       websocket?.sendMessage({ type: PICTURE_EDIT_MESSAGE_TYPE_ENUM.SAVE_ACTION })
-      imgUrl.value = picture.url
-      //TODO 不关闭弹窗（优雅关闭，等websocket执行完成后再断开连接）
+      closeModal()
     } else {
       message.error('图片上传失败,' + res.data.message)
     }
@@ -225,14 +224,15 @@ const initWebSocket = () => {
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.SAVE_ACTION, async (msg) => {
     console.log('收到用户保存图片的通知：', msg)
     message.info(msg.message)
+    editingUser.value = undefined
     //重新获取图片
     const res = await getPictureVoByIdUsingGet({ id: props.picture?.id })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       const picture = { ...data, url: data.url?.split('?')[0] }
       props.onSuccess?.(picture)
+      imgUrl.value = props.imageUrl || ''
     }
-    closeModal()
   })
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
     console.log('收到编辑操作通知：', msg)
@@ -254,9 +254,9 @@ const initWebSocket = () => {
     }
   })
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
+    editingUser.value = undefined
     console.log('收到退出编辑状态通知：', msg)
     message.info(msg.message)
-    editingUser.value = undefined
   })
 }
 watch(
