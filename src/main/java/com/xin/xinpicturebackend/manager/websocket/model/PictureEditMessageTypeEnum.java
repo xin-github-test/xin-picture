@@ -9,6 +9,7 @@ public enum PictureEditMessageTypeEnum {
     ERROR("发送错误", "ERROR"),
     ENTER_EDIT("进入编辑状态", "ENTER_EDIT"),
     EXIT_EDIT("退出编辑状态", "EXIT_EDIT"),
+    EXIT_SESSION("退出会话", "EXIT_SESSION"),
     EDIT_ACTION("执行编辑操作", "EDIT_ACTION"),
     SAVE_ACTION("保存图片", "SAVE_ACTION"),
     GET_EDITING_USER("获取正在编辑的用户", "GET_EDITING_USER");

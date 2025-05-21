@@ -230,8 +230,8 @@ const initWebSocket = () => {
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
       const picture = { ...data, url: data.url?.split('?')[0] }
+      imgUrl.value = picture.url || ''
       props.onSuccess?.(picture)
-      imgUrl.value = props.imageUrl || ''
     }
   })
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EDIT_ACTION, (msg) => {
@@ -256,6 +256,13 @@ const initWebSocket = () => {
   websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_EDIT, (msg) => {
     editingUser.value = undefined
     console.log('收到退出编辑状态通知：', msg)
+    message.info(msg.message)
+  })
+  websocket.on(PICTURE_EDIT_MESSAGE_TYPE_ENUM.EXIT_SESSION, (msg) => {
+    if (!(msg.user && editingUser.value?.id === msg.user.id)) {
+      editingUser.value = undefined
+    }
+    console.log('收到退出会话通知：', msg)
     message.info(msg.message)
   })
 }

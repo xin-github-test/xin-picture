@@ -11,6 +11,7 @@ import com.xin.xinpicturebackend.manager.websocket.model.PictureEditMessageTypeE
 import com.xin.xinpicturebackend.manager.websocket.model.PictureEditRequestMessage;
 import com.xin.xinpicturebackend.manager.websocket.model.PictureEditResponseMessage;
 import com.xin.xinpicturebackend.model.entity.User;
+import com.xin.xinpicturebackend.model.vo.UserVO;
 import com.xin.xinpicturebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -237,15 +238,19 @@ public class PictureEditHandler extends TextWebSocketHandler {
         }
         //判断当前是否为正在编辑的用户，是的话需要清除正在编辑的状态
         Long editingUserId = pictureEditingUsers.get(pictureId);
-        if (editingUserId != null && editingUserId.equals(user.getId())) {
-            //移除用户正在编辑该图片
-            pictureEditingUsers.remove(pictureId);
+        UserVO editingUser = null;
+        if (editingUserId != null) {
+            editingUser = userService.getUserVO(userService.getById(editingUserId));
+            if (editingUserId.equals(user.getId())) {
+                //移除用户正在编辑该图片
+                pictureEditingUsers.remove(pictureId);
+            }
         }
         // 通知其他用户，该用户已经退出编辑会话
         PictureEditResponseMessage pictureEditResponseMessage = new PictureEditResponseMessage();
-        pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.INFO.getValue());
+        pictureEditResponseMessage.setType(PictureEditMessageTypeEnum.EXIT_SESSION.getValue());
         String message = String.format("用户 %s 退出会话", user.getUserName());
-        pictureEditResponseMessage.setUser(userService.getUserVO(user));
+        pictureEditResponseMessage.setUser(editingUser);
         pictureEditResponseMessage.setMessage(message);
         //广播给所有用户(用户退出会话)
         broadcastToPicture(pictureId, pictureEditResponseMessage);
